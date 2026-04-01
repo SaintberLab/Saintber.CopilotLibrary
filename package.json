@@ -1,0 +1,38 @@
+{
+  "name": "@saintber/copilot-library",
+  "version": "0.1.0",
+  "description": "CLI for installing and updating Copilot instructions, prompts, agents, and skills into a target directory.",
+  "type": "module",
+  "bin": {
+    "saintber-copilot": "./bin/copilot-library.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "templates",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "start": "node ./bin/copilot-library.js",
+    "test": "node --test",
+    "prepublishOnly": "npm test"
+  },
+  "keywords": [
+    "copilot",
+    "cli",
+    "prompt",
+    "agent",
+    "instructions"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saintber/Saintber.CopilotLibrary.git"
+  },
+  "author": "Saintber",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/saintber/Saintber.CopilotLibrary/issues"
+  },
+  "homepage": "https://github.com/saintber/Saintber.CopilotLibrary#readme"
+}
