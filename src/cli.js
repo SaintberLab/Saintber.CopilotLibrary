@@ -5,6 +5,7 @@ import {
   copyFileSync,
   existsSync,
   readdirSync,
+  rmSync,
 } from "fs";
 import { join, relative, resolve, dirname } from "path";
 import { fileURLToPath } from "url";
@@ -91,6 +92,101 @@ function copyFiles(files, srcBase, destBase) {
   }
 }
 
+function getFilenameFromRelativePath(filePath) {
+  return filePath.split("/").pop() ?? filePath;
+}
+
+function getModuleSelectorFromFile(filePath) {
+  const filename = getFilenameFromRelativePath(filePath);
+  const knownSuffixes = [
+    ".instructions.md",
+    ".agent.md",
+    ".prompt.md",
+    ".skill.md",
+  ];
+  const suffix = knownSuffixes.find((item) => filename.endsWith(item));
+  return suffix ? filename.slice(0, -suffix.length) : filename.replace(/\.md$/, "");
+}
+
+function collectModuleSelectors(files) {
+  const selectors = new Set();
+  for (const file of files) {
+    const selector = getModuleSelectorFromFile(file);
+    if (!selector) continue;
+
+    const namespace = selector.split(".")[0].split("-")[0];
+    if (namespace) {
+      selectors.add(namespace);
+    }
+    if (selector.includes(".")) {
+      selectors.add(selector);
+    }
+  }
+  return Array.from(selectors).sort();
+}
+
+function mergeInstalledFiles(previousFiles, nextFiles) {
+  return Array.from(
+    new Set([...(previousFiles ?? []), ...(nextFiles ?? [])])
+  ).sort();
+}
+
+function mergeTrackedModules(previousModules, requestedModules) {
+  if (!requestedModules || requestedModules.length === 0) {
+    return ["all"];
+  }
+
+  const previous = Array.isArray(previousModules)
+    ? previousModules.filter(Boolean)
+    : [];
+
+  if (previous.includes("all")) {
+    return ["all"];
+  }
+
+  return Array.from(new Set([...previous, ...requestedModules])).sort();
+}
+
+function removeFiles(files, destBase) {
+  const boundary = resolve(destBase);
+
+  for (const f of files) {
+    const dest = join(destBase, f);
+    if (!existsSync(dest)) continue;
+
+    rmSync(dest, { force: true });
+
+    let current = resolve(dirname(dest));
+    while (current.startsWith(boundary) && current !== boundary) {
+      if (!existsSync(current) || readdirSync(current).length > 0) {
+        break;
+      }
+      rmSync(current, { recursive: true, force: true });
+      current = resolve(dirname(current));
+    }
+  }
+}
+
+function resolveExpectedFiles(state, modules) {
+  if (modules && modules.length > 0) {
+    return collectFiles(TEMPLATES_DIR, TEMPLATES_DIR, modules);
+  }
+
+  if (Array.isArray(state?.installedFiles) && state.installedFiles.length > 0) {
+    return state.installedFiles;
+  }
+
+  if (
+    Array.isArray(state?.modules) &&
+    state.modules.length > 0 &&
+    !state.modules.includes("all")
+  ) {
+    return collectFiles(TEMPLATES_DIR, TEMPLATES_DIR, state.modules);
+  }
+
+  return collectFiles(TEMPLATES_DIR, TEMPLATES_DIR, null);
+}
+
 export async function run(argv) {
   const [, , command, ...rawArgs] = argv;
   const opts = parseArgs(rawArgs);
@@ -115,6 +211,7 @@ export async function run(argv) {
         process.exitCode = 1;
         return;
       }
+      const previousState = readState(targetDir) ?? {};
       const files = collectFiles(TEMPLATES_DIR, TEMPLATES_DIR, modules);
       if (files.length === 0) {
         console.error(
@@ -125,7 +222,11 @@ export async function run(argv) {
       }
       const destGithub = join(targetDir, GITHUB_SUBDIR);
       copyFiles(files, TEMPLATES_DIR, destGithub);
-      writeState(targetDir, { modules: modules ?? ["all"] });
+      const installedFiles = mergeInstalledFiles(previousState.installedFiles, files);
+      writeState(targetDir, {
+        modules: mergeTrackedModules(previousState.modules, modules),
+        installedFiles,
+      });
       console.log(`✓ Installed ${files.length} file(s) to ${destGithub}`);
       break;
     }
@@ -152,7 +253,11 @@ export async function run(argv) {
       }
       const destGithub = join(targetDir, GITHUB_SUBDIR);
       copyFiles(files, TEMPLATES_DIR, destGithub);
-      writeState(targetDir, { modules: effectiveModules ?? ["all"] });
+      const installedFiles = mergeInstalledFiles(state?.installedFiles, files);
+      writeState(targetDir, {
+        modules: mergeTrackedModules(state?.modules, effectiveModules),
+        installedFiles,
+      });
       console.log(`✓ Updated ${files.length} file(s) in ${destGithub}`);
       break;
     }
@@ -187,8 +292,10 @@ export async function run(argv) {
       const checkModules = modules;
       if (checkModules) {
         console.log(`\nChecking modules: ${checkModules.join(", ")}`);
+      } else if (Array.isArray(state?.installedFiles) && state.installedFiles.length) {
+        console.log(`\nChecking tracked installed files from state.json`);
       }
-      const expected = collectFiles(TEMPLATES_DIR, TEMPLATES_DIR, checkModules);
+      const expected = resolveExpectedFiles(state, checkModules);
       const destGithub = join(targetDir, GITHUB_SUBDIR);
       const missing = expected.filter((f) => !existsSync(join(destGithub, f)));
       if (missing.length === 0) {
@@ -205,6 +312,108 @@ export async function run(argv) {
       break;
     }
 
+    case "list": {
+      const files = collectFiles(TEMPLATES_DIR, TEMPLATES_DIR, null);
+      if (files.length === 0) {
+        console.error("Error: no installable templates found");
+        process.exitCode = 1;
+        return;
+      }
+
+      const selectors = collectModuleSelectors(files);
+      console.log("Available module selectors:");
+      for (const selector of selectors) {
+        console.log(`  - ${selector}`);
+      }
+
+      const targetDir = resolve(process.cwd(), opts.target || ".");
+      const state = readState(targetDir);
+      if (state?.installedFiles?.length) {
+        console.log("\nTracked installed module selectors in target:");
+        for (const selector of collectModuleSelectors(state.installedFiles)) {
+          console.log(`  - ${selector}`);
+        }
+      }
+      break;
+    }
+
+    case "remove": {
+      const targetDir = resolve(process.cwd(), opts.target || ".");
+      if (!existsSync(targetDir)) {
+        console.error(`Error: target directory does not exist: ${targetDir}`);
+        process.exitCode = 1;
+        return;
+      }
+
+      if (!modules || modules.length === 0) {
+        console.error(
+          "Error: remove requires --module or --modules so removal stays scoped to specific installed content"
+        );
+        process.exitCode = 1;
+        return;
+      }
+
+      const state = readState(targetDir);
+      if (!state) {
+        console.error(
+          "Error: state file not found (.copilot-library/state.json) — cannot safely remove tracked files"
+        );
+        process.exitCode = 1;
+        return;
+      }
+
+      if (!Array.isArray(state.installedFiles)) {
+        console.error(
+          "Error: this installation does not track installed files yet. Run 'update' once to refresh state.json before using 'remove'."
+        );
+        process.exitCode = 1;
+        return;
+      }
+
+      const isFullRemoval = modules.includes("all");
+      const filesToRemove = isFullRemoval
+        ? state.installedFiles
+        : state.installedFiles.filter((file) =>
+            matchesModules(getFilenameFromRelativePath(file), modules)
+          );
+
+      if (filesToRemove.length === 0 && !isFullRemoval) {
+        console.log(
+          `No tracked files matched modules: ${modules.join(", ")}`
+        );
+        break;
+      }
+
+      const destGithub = join(targetDir, GITHUB_SUBDIR);
+      removeFiles(filesToRemove, destGithub);
+
+      const filesToRemoveSet = new Set(filesToRemove);
+      const remainingFiles = isFullRemoval
+        ? []
+        : state.installedFiles.filter((file) => !filesToRemoveSet.has(file));
+
+      if (remainingFiles.length === 0) {
+        rmSync(join(targetDir, ".copilot-library"), {
+          recursive: true,
+          force: true,
+        });
+        console.log(
+          `✓ Removed ${filesToRemove.length} tracked file(s) for module(s): ${modules.join(", ")} and cleared .copilot-library`
+        );
+        break;
+      }
+
+      writeState(targetDir, {
+        modules: collectModuleSelectors(remainingFiles),
+        installedFiles: remainingFiles,
+      });
+
+      console.log(
+        `✓ Removed ${filesToRemove.length} tracked file(s) for module(s): ${modules.join(", ")}`
+      );
+      break;
+    }
+
     default:
       console.log("Usage:");
       console.log(
@@ -216,10 +425,16 @@ export async function run(argv) {
       console.log(
         "  npx @saintber/copilot-library doctor [--target <dir>] [--module <ns1,ns2>]"
       );
+      console.log(
+        "  npx @saintber/copilot-library list   [--target <dir>]"
+      );
+      console.log(
+        "  npx @saintber/copilot-library remove [--target <dir>] --module <ns1,ns2|all>"
+      );
       console.log("");
       console.log("Options:");
       console.log(
-        "  --target   Target directory to install into, update, or check (default: current directory)"
+        "  --target   Target directory to install into, update, check, list, or remove from (default: current directory)"
       );
       console.log(
         "  --module   Comma-separated namespace modules to filter (supports sub-namespaces)"

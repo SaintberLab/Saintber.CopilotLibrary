@@ -6,7 +6,27 @@
 
 ## [未發布]
 
-*（本段為下一個發布週期的暫存區）*
+---
+
+## [0.2.0] - 2026-04-02
+
+### 新增
+- 新增 `copilot.speckit-customizer` 專用 agent，用於將 Speckit 客製意圖轉為精確 overlay 規格，並在上游 Speckit 升版後重複套用。
+- CLI 新增 `list` 命令，可列出目前可安裝的 module selectors，並在目標專案已有 state 時顯示已追蹤的已安裝模組。
+- CLI 新增 `remove --module <ns>` 命令，可依模組安全解除安裝已追蹤的 CopilotLibrary 檔案。
+- CLI 支援 `remove --module all`，可完整移除所有已追蹤安裝內容並清除 `.copilot-library/` 狀態目錄，同時保留使用者原有的 `.github` 項目。
+
+### 變更
+- `/copilot.apply-speckit-customizations`：改為由 `copilot.speckit-customizer` 執行，並將原始 Speckit 客製需求改寫成精確 overlay 契約，而非直接內嵌需求原文。
+- `copilot.maintenance.instructions.md`：移除 Speckit 專屬細節，回復為共通維護規範；改以「vendor 基線保留」與「領域邏輯放專用 agent/prompt」兩條通則表達。
+- `copilot.maintainer.agent.md`：移除 Speckit 專屬目標與流程，維持為通用維護 agent。
+- `copilot.speckit-customizer.agent.md` 與 `/copilot.apply-speckit-customizations`：簡化為使用者專案適用的輕量 overlay 流程；預設不再依賴完整 `/copilot.maintain`、複雜 changelog/release 或 requirement history 步驟，但仍保留 English normalization、語意合併與 `.copilot/composed/` 繁中同步。
+- `copilot.speckit-customizer.agent.md`：新增明確規則，要求寫入 `.copilot/composed/` 的文件必須是對應 `.github/` 產物的全文繁體中文完整版本，不得只翻譯新增的客製化片段；並於 Guardrails 補充禁止產出中英混雜或部分翻譯版本。
+- `copilot.apply-speckit-customizations.prompt.md`：強化輕量 Overlay 規則第 6 條，明確指出 composed 檔案必須是整份文件的全文繁體中文版本；同步補回「文件產物語言」既定 Overlay 目標（第 5 項）。
+- `.copilot/composed/agents/copilot.speckit-customizer.agent.md`、`.copilot/composed/prompts/copilot.apply-speckit-customizations.prompt.md`：修正為全文繁體中文的完整版本，反映對應 `.github/` 產物目前最新內容。
+- `.github/TOOLS.md`：新增 `copilot.speckit-customizer` agent，並更新 `/copilot.apply-speckit-customizations` 說明與對應 agent。
+- `src/cli.js`：`state.json` 會額外記錄 `installedFiles`，`doctor` 會優先依追蹤清單檢查，避免模組化安裝時誤判缺漏。
+- `copilot.maintain` release 規則：當使用者明確指定發布版號時，除 CHANGELOG 封版與 `.github/` → `/templates/` 同步外，也必須同步更新 `package.json` 的 `version` 欄位。
 
 ---
 

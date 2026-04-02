@@ -29,11 +29,12 @@ applyTo: ".github/instructions/**/*.md,.github/agents/**/*.md,.github/prompts/**
 - 需求歷程條目應採正式模板，至少包含：`Recorded At`、`Change Summary`、`Affected Artifacts`、`Original Requirement`。
 - 當使用者明確宣告「發布新版」時，需將 `[未發布]` 內容移入目標版本段，並保留新的空白 `[未發布]` 區塊供下一輪累積。
 - 發布新版時，也必須將各 namespace 歷程檔中 `[未發布]` 的需求條目一併移入對應正式版本段落，並保留新的空白 `[未發布]` 段落。
+- 若發布時有指定目標版號，必須在同一次發布流程中同步更新 repository `package.json` 的 `version` 欄位為相同版號。
 - 發布流程需提供完整 git commit/tag 指令與完整 commit 訊息內容；若環境無版控，僅提供指令引導，不強制執行。
 - 發布新版時，必須將 `.github/` 所有內容同步至 `/templates/` 作為 CLI 部署產物，再產出 git 發布命令。
 - `.github/TOOLS.md` 屬於發布範圍，發布時必須隨 `.github/` 同步到 `/templates/`。
 - 每次維護後必須同步更新 `.github/TOOLS.md`，反映工具新增、移除或行為變更。
-- Speckit 產物由 Microsoft 官方維運，本專案僅保留 `.copilot/composed/speckit-backup/` 備份，不在 `.github/` 發布。
+- 具領域針對性的客製化邏輯，應放在專用 agent / prompt，而不是寫進 repository-wide 的共通維護 instruction。
 - 若目標不在 `/.github/`，需遵循 `.copilot/README.md` 定義的流程（sources → base → composed → publish）。
 - 每次更新 `.github/` 檔案時，必須在同一次操作同步更新 `.copilot/composed/` 對應完整繁中檔案，不得略過或延後。
 

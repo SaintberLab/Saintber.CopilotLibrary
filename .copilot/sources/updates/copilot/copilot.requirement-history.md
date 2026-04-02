@@ -12,7 +12,130 @@
 
 ## [未發布]
 
-*（本段為下一個發布週期的暫存區）*
+---
+
+## [0.2.0]
+
+### 2026-04-02 07 - speckit-customizer-full-zh-tw-composed-output
+
+- Recorded At: `2026-04-02`
+- Change Summary: 強化 `copilot.speckit-customizer` 與 `/copilot.apply-speckit-customizations` 的規則，明確要求寫入 `.copilot/composed/` 的文件必須是對應 `.github/` 產物的全文繁體中文完整版本，而不是只翻譯新增的客製化片段，並同步修正現有 composed 檔案為全文繁體中文。
+- Affected Artifacts: `copilot.speckit-customizer.agent.md`, `copilot.apply-speckit-customizations.prompt.md`, `.copilot/composed/agents/copilot.speckit-customizer.agent.md`, `.copilot/composed/prompts/copilot.apply-speckit-customizations.prompt.md`, `CHANGELOG.md`, `copilot.requirement-history.md`
+
+```md
+優化 copilot.speckit-customizer.agent.md , copilot.apply-speckit-customizations.prompt.md
+問題：
+- 更新完成後，保留到 /prompt 的合併版本，只有新加入的內容為繁體中文，應該要是全文為繁體中文
+
+需求：
+- 當套用客製化完成後，應該以「全文為繁體中文」的形式保留文件至 /composed 的相對位置，而不是只有客製化的部分
+- copilot.speckit-customizer.agent.md, copilot.apply-speckit-customizations.prompt.md 本身的更新仍遵守共通規範
+```
+
+### 2026-04-02 06 - release-sync-package-json-version
+
+- Recorded At: `2026-04-02`
+- Change Summary: 補充共通 release 維護規範：當使用者明確指定發布版號時，`copilot.maintain` 必須在同一次發布流程中同步更新 `package.json` 的 `version` 欄位，並與 CHANGELOG、requirement history、templates 同步行為保持一致。
+- Affected Artifacts: `copilot.maintenance.instructions.md`, `copilot.maintainer.agent.md`, `copilot.maintain.prompt.md`, `TOOLS.md`, `CHANGELOG.md`, `copilot.requirement-history.md`
+
+```md
+請調整共通規範的 release，當指定要求 release 的時候，應同時將版號寫入 #file:package.json
+```
+
+### 2026-04-02 05 - cli-full-remove-all-support
+
+- Recorded At: `2026-04-02`
+- Change Summary: `remove` 現在支援 `--module all` 作為完整解除安裝模式；會移除所有已追蹤安裝內容並清除 `.copilot-library/` 狀態目錄，但仍保留使用者自有 `.github` 檔案。
+- Affected Artifacts: `src/cli.js`, `src/cli.test.js`, `README.md`, `CHANGELOG.md`, `TOOLS.md`, `copilot.requirement-history.md`
+
+```md
+看起來 remove 沒有支援全模組移除的功能，請調整為輸入 --module 參數可以完整移除所有模組，並且移除 copilot-library 目錄/檔案，也就是完整移除所有安裝 (但不可動到 user 的其他 .github 項目)
+```
+
+### 2026-04-02 04 - cli-list-and-safe-remove
+
+- Recorded At: `2026-04-02`
+- Change Summary: `cli.js` 新增 `list` 與模組級 `remove` 能力，並於 `state.json` 記錄 `installedFiles`，確保解除安裝時只移除由 CopilotLibrary 安裝與追蹤的 `.github` 檔案，同時保留使用者原有內容。
+- Affected Artifacts: `src/cli.js`, `src/cli.test.js`, `README.md`, `CHANGELOG.md`, `TOOLS.md`, `copilot.requirement-history.md`
+
+```md
+目的：更新 #file:cli.js 以支援 list, remove 功能
+問題：目前僅有安裝/更新/確認版本功能，無法列出可安裝模組、無法解除安裝
+需求：
+- 需支援解除安裝，但不能刪除使用者原本的 .github 內容，故須明確知道當初安裝了哪些內容
+- 解除安裝的目標以模組為單位即可
+```
+
+### 2026-04-02 03 - simplify-speckit-customizer-workflow
+
+- Recorded At: `2026-04-02`
+- Change Summary: 將 `copilot.speckit-customizer` 與 `/copilot.apply-speckit-customizations` 調整為專案級輕量 overlay 流程，不再預設依賴 `copilot.maintenance.instructions.md`、複雜 changelog/release 或 requirement history 步驟，但保留 English normalization、語意合併與 `.copilot/composed/` 繁中同步能力。
+- Affected Artifacts: `copilot.speckit-customizer.agent.md`, `copilot.apply-speckit-customizations.prompt.md`, `TOOLS.md`, `CHANGELOG.md`, `copilot.requirement-history.md`
+
+```md
+調整
+#file:copilot.apply-speckit-customizations.prompt.md 
+#file:copilot.speckit-customizer.agent.md 
+問題：
+- 此命令用於使用者各自的專案，不需要複雜的 copilot-maintain 流程支援、複雜的 changelog
+需求：
+- 不須再遵守 #file:copilot.maintenance.instructions.md 
+- 擷取共通規範中關於「翻譯為英文、保留語意合併至目標、複製一分繁體中文版本到 /composed 對應目錄」的主要維護功能部分，更新至專屬的 #file:copilot.speckit-customizer.agent.md
+```
+
+### 2026-04-02 02 - refine-speckit-customizer-boundaries
+
+- Recorded At: `2026-04-02`
+- Change Summary: 將 Speckit 專屬邏輯自 `copilot.maintenance.instructions.md` 與 `copilot.maintainer.agent.md` 抽離，新增 `copilot.speckit-customizer` 專用 agent，並把 `copilot.apply-speckit-customizations.prompt.md` 改寫為精確 overlay 契約，避免直接內嵌原始需求原文。
+- Affected Artifacts: `copilot.maintenance.instructions.md`, `copilot.maintainer.agent.md`, `copilot.speckit-customizer.agent.md`, `copilot.apply-speckit-customizations.prompt.md`, `TOOLS.md`, `CHANGELOG.md`, `copilot.requirement-history.md`
+
+```md
+請再優化 copilot.apply-speckit-customizations.prompt
+問題：
+1. 調整時汙染了 copilot.maintenance.instructions.md
+2. Prompt 本身不夠精確
+需求：
+1. copilot.maintenance.instructions.md 作為維護 copilot 的基本規範，應該制定的是共通的規範而不該有針對性的內容
+2. 本客製化需求若有需要可打造一個 agent，不一定只靠 prompt
+3. 我提出的調整 speckit 的需求，應該轉化為更精確、有針對性地描述去修正 speckit，而不是把我需求原文直接放進去
+```
+
+### 2026-04-01 01 - speckit-overlay-prompt-and-policy-checks
+
+- Recorded At: `2026-04-01`
+- Change Summary: 新增可重複套用 Speckit 客製覆蓋的 prompt，納入憲章 draft/release 版號規則、`constitution.intent.raw.md` 原文留存與 Session Index，以及 `/speckit.plan`、`/speckit.tasks`、`/speckit.implement` 對 `/docs/policy/**` 的自動合規檢查要求。
+- Affected Artifacts: `copilot.maintenance.instructions.md`, `copilot.maintainer.agent.md`, `copilot.apply-speckit-customizations.prompt.md`, `TOOLS.md`, `CHANGELOG.md`, `copilot.requirement-history.md`
+
+```md
+我想製作一個 prompt，目的是套用我習慣的客製化內容，更新到 speckit agents 上，並遵守 /copilot.maintain 的規範
+
+原因：
+speckit 會定期更版，我想簡單的用一個 prompt 就可以將我的客製內容，套用到新版的 speckit agents 上
+
+想套用的需求：
+== Constitution ==
+- 使用 /speckit.consitution 更新憲章時，使用者尚未宣告 Release(定稿)，憲章版號應標記為舊版號-draft，表示還會被更新
+- 將使用者透過 /speckit.consitution 輸入的憲章需求，保存原文在 /docs/constitutions/constitution.intent.raw.md，依照時間先後反序排列，並編版號為 Draft.[編號]
+- 使用 /speckit.consitution 更新憲章時，使用者宣告 Release(定稿)，憲章版號應標記為新版號，並將 constitution.intent.raw.md 的 Draft.[編號] 改為 [新版號].[編號]
+- constitution.intent.raw.md 應加上索引，欄位如下
+	## 對話記錄索引（Session Index）
+
+	| Session 版號 | 日期 | 對應憲章版本 | 主題摘要 |
+	|-------------|------|------------|----------|
+
+
+== Plan ==
+
+- 使用者執行 /speckit.plan 的時候，會自動將 /docs/policy/** 的規範與設計納入計畫
+
+== Task ==
+
+- 使用者執行 /speckit.tasks 的時候，會自動檢查是否違背 /docs/policy/** 的規範與設計
+
+== Implements ==
+
+- 使用者執行 /speckit.implement 的時候，會自動檢查是否違背 /docs/policy/** 的規範與設計
+```
 
 ---
 

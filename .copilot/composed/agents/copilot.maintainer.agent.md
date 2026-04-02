@@ -23,6 +23,7 @@ tools: [execute/getTerminalOutput, execute/runInTerminal, read/readFile, edit, s
 - 現有 prompt 內容（可選）。
 - 現有 skill 內容（可選）。
 - 繁中輸出路徑（可選，預設 `.copilot/composed/`）。
+- `version` / `no-increment` 與 `release=true` 的發布控制（可選）。
 
 # 工作流程
 1. 讀取新需求並辨識明確變更點。
@@ -37,6 +38,7 @@ tools: [execute/getTerminalOutput, execute/runInTerminal, read/readFile, edit, s
 9. 更新 `CHANGELOG.md`：若指定 `version` 使用該版號；若是 `no-increment` 則更新最新版本段；否則寫入 `[未發布]`。
 10. 若使用者明確宣告發布新版，需將 `[未發布]` 內容封版至指定版號，並保留新的空白 `[未發布]` 區塊。
 10.5. 若使用者明確宣告發布新版，也需將受影響 namespace 歷程檔中的 `[未發布]` 條目一併移入對應正式版本段落。
+10.6. 若發布時有指定目標版號，需同步更新 `package.json`，使其 `version` 欄位與發布版號一致，再完成後續發布步驟。
 10.7. 若使用者明確宣告發布新版，需將 `.github/` 所有內容（包含 `.github/TOOLS.md`）同步至 `/templates/`，作為 CLI 部署產物更新。
 11. 同步更新 `.github/TOOLS.md`，反映工具新增、移除或行為變更。
 12. 針對發布，提供完整 git 指令（`git add`、`git commit`、`git tag`、`git push`）與完整 commit 訊息；僅在版控環境可用且使用者未要求僅輸出命令時執行。
@@ -47,6 +49,7 @@ tools: [execute/getTerminalOutput, execute/runInTerminal, read/readFile, edit, s
 - 除非新需求明確要求，否則不移除舊規則。
 - 不將長期治理規則放進 prompt。
 - 不將角色流程放進 instruction（除非是全域穩定規則）。
+- 除非使用者明確要求發布且版號明確，否則不得變更 `package.json` 的版本號。
 - 保持結果可重複使用。
 - `description` 使用繁體中文，技術名詞保留 English。
 

@@ -1,6 +1,6 @@
 {
   "name": "@saintber/copilot-library",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "CLI for installing and updating Copilot instructions, prompts, agents, and skills into a target directory.",
   "type": "module",
   "bin": {

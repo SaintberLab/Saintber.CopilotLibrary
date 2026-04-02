@@ -39,6 +39,7 @@ status: active
 13. 同步更新 `.github/TOOLS.md`。
 14. 若為發布情境，將 `[未發布]` 內容封版到目標版本，並保留新的 `[未發布]` 區塊。
 14.5. 若為發布情境，也將受影響 namespace 歷程檔中的 `[未發布]` 條目移入目標版本段落。
+14.6. 若發布時有指定目標版號，需在同一次操作同步更新 `package.json`，使其 `version` 欄位與發布版號一致。
 14.7. 若為發布情境，將 `.github/` 所有內容（包含 `.github/TOOLS.md`）同步至 `/templates/` 作為 CLI 部署產物。
 15. 提供完整 git 發布命令（commit + tag + push）；若無版控環境，僅提供指令，不強制執行。
 
@@ -50,6 +51,7 @@ status: active
 
 # 必要檔案更新行為
 - 當有目標路徑且具備寫入權限時，必須直接更新對應檔案。
+- 若 `release=true` 且有明確 `version`，必須同步更新 `package.json`，使其 `version` 欄位與發布版號一致。
 - 必須寫入對應 `composed_path` 的完整繁中版本。
 - 不可默默略過更新；若失敗需明確指出路徑與原因。
 
@@ -102,3 +104,4 @@ status: active
 - skill: <updated|skipped|failed|not-applicable> - <path>
 - changelog: <updated|skipped|failed> - CHANGELOG.md
 - tools: <updated|skipped|failed> - .github/TOOLS.md
+- package: <updated|skipped|failed> - package.json
