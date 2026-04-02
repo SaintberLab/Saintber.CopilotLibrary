@@ -1,16 +1,18 @@
 ---
 description: 維護 Copilot 客製化產物（含 instruction、agent、prompt 及 skill）的穩定規則。
-applyTo: ".github/instructions/**/*.md,.github/agents/**/*.md,.github/prompts/**/*.md,.copilot/**/*.md"
+applyTo: ".github/instructions/copilot.maintenance.instructions.md,.github/agents/copilot.maintainer.agent.md,.github/prompts/copilot.maintain.prompt.md,.github/TOOLS.md,.copilot/**/*.md"
 ---
 
 # Purpose
-Define stable repository-wide rules for maintaining Copilot instructions, agents, prompts, skills, and their source materials.
+Define stable rules for the Copilot maintenance toolchain and its related source materials.
 
 # Scope
-These rules apply to Copilot customization artifacts — including instruction, agent, prompt, and skill — and their source, composed, and published forms.
+These rules apply only to the Copilot maintenance toolchain itself — `copilot.maintenance.instructions.md`, `copilot.maintainer.agent.md`, `copilot.maintain.prompt.md`, `.github/TOOLS.md` — and the related source, composed, and published forms under `.copilot/**`. They should not automatically govern arbitrary downstream project-local `.github` rules or third-party vendor AI artifacts.
 
 # Stable Rules
 - Treat `.copilot/` as the authoring layer and `.github/` as the publish layer.
+- Use this maintenance governance only for explicit maintenance or release work on the library’s own Copilot artifacts.
+- Because the `applyTo` scope is intentionally narrow, `copilot.maintainer.agent.md` must also embed and enforce the same maintenance governance during execution; compliance must not rely on `applyTo` alone.
 - Keep instruction, agent, prompt, and skill responsibilities separated.
 - Preserve existing rules unless the new requirement explicitly changes them.
 - Minimize unrelated edits during updates.

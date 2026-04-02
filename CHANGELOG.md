@@ -6,6 +6,16 @@
 
 ## [未發布]
 
+### 變更
+- `copilot.maintenance.instructions.md`：收斂 `applyTo` 範圍至 `copilot.maintenance.instructions.md`、`copilot.maintainer.agent.md`、`copilot.maintain.prompt.md`、`.github/TOOLS.md` 與 `.copilot/**`，避免套件使用者修改自有規則或第三方 vendor AI 時誤觸 repository-wide maintain 規範。
+- `copilot.maintainer.agent.md`：將核心維護治理內嵌至 agent 本身，確保只要透過此 agent 執行，即使 target files 不在 instruction `applyTo` 內，也必須遵守 English normalization、CHANGELOG / TOOLS / requirement history 更新與 `.copilot/composed/` 同步。
+- `copilot.maintain.prompt.md`：委派契約新增規則，不得因 `applyTo` 未命中而略過 `copilot.maintainer` 的完整維護治理。
+- `.github/TOOLS.md`：同步更新 `copilot.maintain` 的 agent-level enforcement 說明，並補列 `/copilot.maintain-test` 測試 prompt。
+- `copilot.maintain-test.prompt.md`：補回缺失的 `.github/` 與 `.copilot/composed/` 測試 prompt 檔案，與既有 `TOOLS.md` / CHANGELOG 記錄保持一致。
+
+### 新增
+- 新增 `copilot.maintain-test.prompt.md` 臨時測試用 prompt；`.github/` 發布層採 English 版本，`.copilot/composed/` 保留完整繁體中文版本，僅供驗證維護流程，請勿於正式環境保留。
+
 ---
 
 ## [0.2.0] - 2026-04-02

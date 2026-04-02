@@ -1,5 +1,5 @@
 ---
-description: 以繁體中文需求更新 Copilot instruction、agent、prompt 及 skill 產物的可重複 prompt。本 prompt 必須在 agent 模式執行，並委派給 copilot.maintainer。
+description: 以繁體中文需求維護本函式庫自身 Copilot instruction、agent、prompt 及 skill 產物的 repository-level 可重複 prompt。本 prompt 必須在 agent 模式執行，並委派給 copilot.maintainer。
 agent: copilot.maintainer
 tools:[read/readFile, agent, edit/createFile, edit/editFiles]
 status: active
@@ -19,12 +19,15 @@ status: active
 - `release`（可選）: 若使用者明確宣告發布新版，設為 `true`
 
 # 任務
-使用 `copilot.maintainer` 子 agent，依新需求更新既有 Copilot 客製化產物。
+使用 `copilot.maintainer` 子 agent，依新需求更新本函式庫自身 Copilot 客製化產物，或執行明確宣告的 release 維護流程。
+
+若只是下游專案本地 `.github` 規則調整或第三方 vendor AI 更新，除非使用者明確要求 `/copilot.maintain`，否則不應將此 prompt 視為預設流程。
 
 # 委派契約
 委派 `copilot.maintainer` 時，要求其：
 1. 讀取繁中需求。
 1.5. 在指定或預設的命名空間歷程檔保留原始需求文本，依版本段落保存，並以正式模板反序寫入作為追蹤記錄。
+1.6. 不論本次 touched files 是否被 `copilot.maintenance.instructions.md` 的 `applyTo` 命中，都必須對所有受影響產物強制套用 `copilot.maintainer.agent.md` 內嵌的完整維護治理。
 2. 先轉為 English 再做 merge analysis。
 3. 合併至 instruction、agent、prompt、skill。
 4. 避免重複。

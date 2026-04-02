@@ -1,5 +1,5 @@
 ---
-description: 以繁體中文需求更新 Copilot instruction、agent、prompt 及 skill 產物的可重複 prompt。本 prompt 必須在 agent 模式執行，並將實作委派給 copilot.maintainer 自訂 agent。
+description: 以繁體中文需求維護本函式庫自身 Copilot instruction、agent、prompt 及 skill 產物的 repository-level 可重複 prompt。本 prompt 必須在 agent 模式執行，並將實作委派給 copilot.maintainer 自訂 agent。
 agent: copilot.maintainer
 tools:[read/readFile, agent, edit/createFile, edit/editFiles]
 status: active
@@ -19,12 +19,15 @@ Provide the following:
 - `release` (optional): set to `true` when the user explicitly declares release publication
 
 # Task
-Use the `copilot.maintainer` subagent to update the existing Copilot customization artifacts using the new requirement.
+Use the `copilot.maintainer` subagent to update the library’s own Copilot customization artifacts or execute explicit release maintenance using the new requirement.
+
+Do not use this as the default flow for arbitrary downstream project-local `.github` rule edits or third-party vendor AI updates unless the user explicitly requests `/copilot.maintain`.
 
 # Delegation Contract
 When invoking the `copilot.maintainer` subagent, require it to:
 1. Read the Traditional Chinese requirement.
 1.5. Preserve original requirement text in the specified/default namespace history file, grouped by version section, recorded in reverse chronological order, and formatted using the standard history template for traceability.
+1.6. Regardless of whether the touched files are matched by `copilot.maintenance.instructions.md` `applyTo`, enforce the full maintenance governance embedded in `copilot.maintainer.agent.md` across all affected artifacts.
 2. Translate the requirement into English for merge analysis.
 3. Merge the new requirement into the existing instruction, agent, prompt, and skill artifacts.
 4. Avoid duplication.

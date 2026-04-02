@@ -1,16 +1,18 @@
 ---
 description: 維護 Copilot 客製化產物（含 instruction、agent、prompt 及 skill）的穩定規則。
-applyTo: ".github/instructions/**/*.md,.github/agents/**/*.md,.github/prompts/**/*.md,.copilot/**/*.md"
+applyTo: ".github/instructions/copilot.maintenance.instructions.md,.github/agents/copilot.maintainer.agent.md,.github/prompts/copilot.maintain.prompt.md,.github/TOOLS.md,.copilot/**/*.md"
 ---
 
 # 目的
-定義維護 Copilot 客製化產物（instruction、agent、prompt、skill）時的穩定規則與責任邊界。
+定義 Copilot 維護工具鏈及其相關 source materials 的穩定規則與責任邊界。
 
 # 適用範圍
-本規則適用於 Copilot 客製化產物的 source、composed、publish 全流程。
+本規則僅適用於 Copilot 維護工具鏈本身 —— `copilot.maintenance.instructions.md`、`copilot.maintainer.agent.md`、`copilot.maintain.prompt.md`、`.github/TOOLS.md` —— 與 `.copilot/**` 下相關的 source、composed、publish 產物；不作為套件使用者自有 `.github` 規則或第三方 vendor AI 檔案的預設治理層。
 
 # 穩定規則
 - `.copilot/` 為 authoring 層，`.github/` 為 publish 層。
+- 僅在使用者明確要求維護本函式庫 Copilot 產物或執行 release 時，才套用此維護治理流程。
+- 因 `applyTo` 範圍被刻意收斂，`copilot.maintainer.agent.md` 也必須在執行時內嵌並強制套用相同維護治理；不可只依賴 `applyTo` 命中與否決定是否遵守規範。
 - instruction、agent、prompt、skill 必須維持職責分離。
 - 除非新需求明確改動，否則不得破壞既有規則。
 - 更新時應最小化不相關修改。
