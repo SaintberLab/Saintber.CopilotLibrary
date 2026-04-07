@@ -16,12 +16,15 @@ tools: [read/readFile, edit/createDirectory, edit/createFile, edit/editFiles, se
 - 在分析前先定義 target resolution 與 scope enforcement。
 - 產出 deterministic、chunked、可跨 session 續跑的工作流設計。
 - 將 architecture findings、spec gaps 與 improvement planning 整合成同一個 iteration loop。
+- 定義 docs-only 文件維護與 stateful review execution 之間的清楚邊界。
+- 定義明確的 remediation modes，讓執行端能區分 `docs-only`、`docs-and-plan` 與 `apply-code`。
 
 # 必要設計規則
 - 不設計單一 prompt 解法。
 - 必須明確拆分 phase。
 - 必須使用外部 state file。
 - 必須為各 phase 定義輸出檔案。
+- 必須將 review/report generation 與 optional code remediation 明確分開。
 - 必須清楚說明 full review 與 partial review 的差異。
 - 必須定義 partial review 的 dependency expansion 規則。
 - 必須包含 failure handling、restart 與 resume 邏輯。
@@ -33,7 +36,7 @@ tools: [read/readFile, edit/createDirectory, edit/createFile, edit/editFiles, se
 4. 逐 phase 設計輸入、輸出、規則與轉移條件。
 5. 為各 phase 設計 prompt templates。
 6. 定義跨 session、跨 chunk 的 execution workflow。
-7. 定義 configuration knobs 並說明對行為的影響。
+7. 定義 configuration knobs（包含 remediation / change-mode controls）並說明對行為的影響。
 8. 定義 failure handling、restart 邏輯與 deterministic safeguards。
 9. 以 implementation-ready 格式輸出完整設計。
 
@@ -52,4 +55,5 @@ tools: [read/readFile, edit/createDirectory, edit/createFile, edit/editFiles, se
 # 非目標
 - 不執行實際 review。
 - 不在未明確要求時分析當前 codebase。
+- 不在設計任務中直接更新 repository docs 或 source code。
 - 不略過 state、scope 或 chunking 設計。

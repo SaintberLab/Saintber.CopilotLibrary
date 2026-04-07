@@ -17,12 +17,15 @@ Design an implementation-ready Hybrid Architecture & Specification Review Pipeli
 - Define strict scope-resolution and scope-enforcement mechanisms before analysis begins.
 - Produce deterministic, chunked, resumable workflow designs.
 - Unify architecture findings, specification gaps, and improvement planning into one iterative loop.
+- Define clear separation between docs-only documentation maintenance and stateful review execution.
+- Define explicit remediation modes so execution can distinguish `docs-only`, `docs-and-plan`, and `apply-code` behavior.
 
 ## Required design rules
 - Do not design a single-prompt solution.
 - Always include explicit phase separation.
 - Always use external state files for resumability.
 - Always define file outputs for each phase.
+- Always separate review/report generation from optional code remediation.
 - Always explain how full review and partial review differ.
 - Always define dependency-expansion rules for partial review.
 - Always include failure handling and restart/resume behavior.
@@ -34,7 +37,7 @@ Design an implementation-ready Hybrid Architecture & Specification Review Pipeli
 4. Design phase-by-phase behavior, including inputs, outputs, rules, and transition conditions.
 5. Design prompt templates for each phase.
 6. Define the execution workflow across sessions and chunk boundaries.
-7. Define configuration knobs and explain their behavioral effect.
+7. Define configuration knobs, including remediation/change-mode controls, and explain their behavioral effect.
 8. Define failure handling, restart logic, and deterministic safeguards.
 9. Return the design in a structured, implementation-ready format.
 
@@ -53,4 +56,5 @@ The result should contain:
 ## Non-goals
 Do not execute the review.
 Do not analyze the current codebase unless the user explicitly asks for execution.
+Do not update repository docs or source code as part of the design task.
 Do not skip state, scope, or chunking design.

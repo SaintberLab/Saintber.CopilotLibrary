@@ -1,7 +1,6 @@
 ---
-mode: agent
 agent: docs.hybrid-review-executor
-description: 執行 Hybrid Architecture & Specification Review Pipeline，依 `/Tasks/State.json` 分階段續跑 FULL 或 PARTIAL review。
+description: 執行 Hybrid Architecture & Specification Review Pipeline，預設 docs-only；依 `change_mode` 決定是否只出報告、加 remediation plan 或處理 code alignment。
 ---
 
 Execute a Hybrid Architecture & Specification Review Pipeline.
@@ -16,12 +15,13 @@ Execute a Hybrid Architecture & Specification Review Pipeline.
 - Include dependencies: `${input:include_dependencies=default:bounded}` (`none` | `direct` | `bounded` | `full`)
 - Boundary rules: `${input:boundary_rules=default:none}`
 - Excluded targets: `${input:excluded_targets=default:none}`
+- Change mode: `${input:change_mode=default:docs-only}` (`docs-only` | `docs-and-plan` | `apply-code`)
 - State path: `${input:state_path=default:/Tasks/State.json}`
 - Review scope path: `${input:review_scope_path=default:/Tasks/Review-Scope.md}`
 - Additional constraints: `${input:constraints=default:none}`
 
 ## Task
-Execute exactly one bounded phase step or one small chunk from the Hybrid Architecture & Specification Review Pipeline.
+Execute exactly one bounded phase step or one small chunk from the Hybrid Architecture & Specification Review Pipeline, following the selected `change_mode`.
 
 ## Mandatory execution rules
 1. Read `State.json` first if it exists.
@@ -31,10 +31,14 @@ Execute exactly one bounded phase step or one small chunk from the Hybrid Archit
 5. Write outputs to the required files for the active phase.
 6. Update `State.json` after every run.
 7. Stop after one bounded chunk; do not attempt full review in one execution.
+8. If `change_mode=docs-only`, produce review artifacts and documentation outputs only; do not modify source code.
+9. If `change_mode=docs-and-plan`, produce review artifacts and remediation planning outputs, but still do not modify source code.
+10. If `change_mode=apply-code`, source-code changes are allowed only when the requested scope is explicit and bounded; write the evidence and state updates first.
 
 ## Expected outputs
 - Current Phase
 - Executed Step
+- Change Mode Used
 - Files Updated
 - State Update Summary
 - Next Step

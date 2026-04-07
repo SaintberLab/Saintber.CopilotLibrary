@@ -16,6 +16,7 @@ The pipeline must:
 - generate unified improvement tasks
 - iterate in small chunks with persistent state
 - support both full and targeted partial review
+- keep documentation/report outputs separate from optional code remediation
 
 ## Standard folder structure
 Required persisted outputs:
@@ -48,11 +49,23 @@ Recommended additional fields:
 - `include_dependencies`
 - `boundary_rules`
 - `excluded_targets`
+- `change_mode`
 - `last_updated_at`
 - `artifact_map`
 - `pending_findings`
 - `iteration_count`
 - `status`
+
+## Remediation mode model
+The execution contract should explicitly support:
+- `docs-only`: produce review artifacts and documentation updates only; never modify source code
+- `docs-and-plan`: produce review artifacts and a bounded remediation plan; still do not modify source code
+- `apply-code`: allow bounded source-code alignment only when explicitly requested and after evidence and plan are recorded
+
+Default posture:
+- start from `docs-only`
+- require explicit opt-in before any source-code change
+- keep code-alignment work traceable back to findings and scope
 
 ## Phase model
 
@@ -105,11 +118,13 @@ Output:
 Responsibilities:
 - incrementally refine `/Architecture/Architecture.md`
 - incrementally refine affected specification documents
+- optionally execute a bounded code-alignment step only when `change_mode=apply-code`
 - re-enter inventory/analysis for changed targets until stable
 
 Rules:
 - each loop handles bounded chunks only
 - state must record current iteration and next tasks
+- code changes must never be an implicit side effect of a docs-only review run
 
 ## Partial review rules
 Partial review must support:
@@ -140,6 +155,7 @@ Each phase prompt should define:
 - state fields to read
 - state fields to update
 - stop conditions
+- which remediation modes are allowed for that run
 
 ## Failure handling
 Handle at least:
@@ -163,6 +179,7 @@ Parameters and expected effect:
 - `depth`: controls evidence breadth and chunk size
 - `scope`: controls system breadth (`module`, `solution`, `system`)
 - `strictness`: controls tolerance for ambiguity and evidence threshold
+- `change_mode`: controls whether the run stays docs-only, adds remediation planning, or is allowed to apply bounded code alignment
 - targeted-review parameters: constrain traversal, inventory size, and analysis reach
 
 ## Output quality bar

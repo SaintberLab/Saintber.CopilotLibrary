@@ -12,6 +12,33 @@
 
 ## [未發布]
 
+### 2026-04-07 05 - docs-hybrid-review-executor-terminal-verification
+
+- Recorded At: `2026-04-07`
+- Change Summary: 為 `docs.hybrid-review-executor` agent 新增 `terminal/runInTerminal` 工具授權，使其能透過 PowerShell 自行驗證執行結果（build / test / 檔案檢查等），並訂義驗證觸發時機與範圍規則。
+- Affected Artifacts: `docs.hybrid-review-executor.agent.md`, `TOOLS.md`
+- Original Requirement:
+
+```md
+請再更新 docs.hybrid 系列，讓 pipeline 的 agent 有權限執行 powershell 自行驗證結果(更新 tools 項目)
+```
+
+### 2026-04-07 04 - docs-hybrid-review-role-clarification
+
+- Recorded At: `2026-04-07`
+- Change Summary: 釐清 `docs.architecture-documenter`、`docs.hybrid-reviewer`、`docs.hybrid-review-executor` 與四個 docs prompts 的職責差異，新增 `inventory_mode` / `change_mode` 等控制，並補強 TOOLS 使用情境說明。
+- Affected Artifacts: `docs.architecture-documenter.agent.md`, `docs.hybrid-reviewer.agent.md`, `docs.hybrid-review-executor.agent.md`, `docs.architecture-review.prompt.md`, `docs.document-architecture.prompt.md`, `docs.hybrid-review.prompt.md`, `docs.hybrid-review-execute.prompt.md`, `docs.hybrid-review-pipeline.skill.md`, `TOOLS.md`
+- Original Requirement:
+
+```md
+針對 docs.hybrid-review 系列(包含純 review 與 execute) 進行調整
+- 請確認 docs.architecture-documenter、docs.architecture-documenter、docs.hybrid-review-executor、docs.hybrid-reviewer 工作職責進行盤點，是否有重工、是否需要合併？若職責各異不需要合併，請在 Tools.md 補充清楚職責差異並補充案例說明什麼情境該用此命令、產生的輸出結果有什麼差異
+- 我原本對 review 的認知只是產出 review 報告或調整架構文件，但執行結果似乎還會修正程式以符合架構設計，這是應該的嗎？若 review 的定義原本就包含程式碼修正以符合架構，請保留參數給我讓我決定是否修正程式架構，並請考慮有參數的狀況確認 prompt 名稱是否需要調整。
+- 若原本的四個 prompt 的設計就包含僅 review 架構文件與同時修正程式架構的兩種狀況，請說明清楚哪種情境該使用哪種命令。
+- 原本的架構盤點命令(如 docs.architecture-documenter) 並不包含完整盤點所有程式碼的做法，若是透過不同命令拆分僅更新文件與同時更新程式碼兩種狀況，請調整原本的盤點作法，以達到同樣能完整盤點的需求，保持兩者作法的一致性
+- 以上需求若有不清楚的地方請先與我討論再執行調整
+```
+
 ### 2026-04-01 03 - architecture-documenter-enhancement
 
 - Recorded At: `2026-04-01`

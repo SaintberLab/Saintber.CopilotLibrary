@@ -7,6 +7,14 @@
 ## [未發布]
 
 ### 變更
+- `docs.hybrid-review-executor.agent.md`：新增 `terminal/runInTerminal` 工具授權，加入 **Verification rules** 段落；允許在執行步驟後自行執行 PowerShell 驗證（build / test / 檔案檢查），並依 `change_mode` 限制驗證範圍。
+- `.github/TOOLS.md`：更新 `docs.hybrid-review-executor` 描述，註明新增 PowerShell 自行驗證能力。
+- `docs.hybrid-review-executor` 輸出要求：新增回報欄位「執行的驗證命令與結果」。
+- `docs.hybrid-review-executor` 非目標：新增禁止項，不得執行影響共用基礎設施或具破壞性的 terminal 命令。
+- `docs.hybrid-review-executor` 主要目標補強 docs.architecture-documenter、docs.hybrid-reviewer、docs.hybrid-review-executor 與四個 docs prompts 的職責差異，新增 `inventory_mode` / `change_mode` 等控制，並補強 TOOLS 使用情境說明。
+- `docs.architecture-review.prompt.md`、`docs.document-architecture.prompt.md`：新增 `inventory_mode` 與 `include_dependencies` 控制，讓 docs-only 流程也能做完整 repository 架構盤點，同時維持不修改 source code。
+- `docs.hybrid-review-execute.prompt.md`、`docs.hybrid-review-executor.agent.md`：新增 `change_mode`（`docs-only` | `docs-and-plan` | `apply-code`），避免將 review 執行誤解為一定會修正程式碼；只有明確 opt-in 才允許進行有界的 code alignment。
+- `.github/TOOLS.md`：補上 `/docs.architecture-review`，新增 docs 系列命令分工表與案例，清楚說明各命令適用情境與輸出差異。
 - `copilot.maintenance.instructions.md`：收斂 `applyTo` 範圍至 `copilot.maintenance.instructions.md`、`copilot.maintainer.agent.md`、`copilot.maintain.prompt.md`、`.github/TOOLS.md` 與 `.copilot/**`，避免套件使用者修改自有規則或第三方 vendor AI 時誤觸 repository-wide maintain 規範。
 - `copilot.maintainer.agent.md`：將核心維護治理內嵌至 agent 本身，確保只要透過此 agent 執行，即使 target files 不在 instruction `applyTo` 內，也必須遵守 English normalization、CHANGELOG / TOOLS / requirement history 更新與 `.copilot/composed/` 同步。
 - `copilot.maintain.prompt.md`：委派契約新增規則，不得因 `applyTo` 未命中而略過 `copilot.maintainer` 的完整維護治理。

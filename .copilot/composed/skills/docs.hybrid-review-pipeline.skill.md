@@ -16,6 +16,7 @@ description: Hybrid Architecture & Specification Review Pipeline 的分階段、
 - 產出統一的改善任務
 - 以小批次、可續跑方式迭代
 - 同時支援 full review 與 targeted partial review
+- 明確區分 documentation / report 輸出與 optional code remediation
 
 ## 標準資料夾結構
 必要輸出檔案：
@@ -48,11 +49,23 @@ State 必須外部持久化，且每次執行都需更新。
 - `include_dependencies`
 - `boundary_rules`
 - `excluded_targets`
+- `change_mode`
 - `last_updated_at`
 - `artifact_map`
 - `pending_findings`
 - `iteration_count`
 - `status`
+
+## Remediation Mode 模型
+執行契約應明確支援：
+- `docs-only`：只產出 review artifacts 與文件更新；不得修改 source code
+- `docs-and-plan`：產出 review artifacts 與有界 remediation plan；仍不得修改 source code
+- `apply-code`：只有在明確要求且先完成 evidence / plan 記錄後，才允許進行有界的 source-code alignment
+
+預設姿態：
+- 從 `docs-only` 起步
+- 任何 source-code 變更都必須明確 opt-in
+- 所有 code-alignment 工作都必須能追溯到 findings 與既定 scope
 
 ## Phase 模型
 
@@ -105,11 +118,13 @@ State 必須外部持久化，且每次執行都需更新。
 責任：
 - 逐步精煉 `/Architecture/Architecture.md`
 - 逐步精煉受影響的 specification documents
+- 僅在 `change_mode=apply-code` 時，才可選擇執行有界的 code-alignment step
 - 依變更結果重新回到 inventory/analysis，直到穩定
 
 規則：
 - 每輪只處理有界 chunk
 - state 必須記錄 iteration 次數與下一步任務
+- docs-only review run 不得把 code changes 當成隱性副作用
 
 ## Partial Review 規則
 必須支援：
@@ -140,6 +155,7 @@ State 必須外部持久化，且每次執行都需更新。
 - state fields to read
 - state fields to update
 - stop conditions
+- 本次允許的 remediation modes
 
 ## Failure Handling
 至少處理：
@@ -163,6 +179,7 @@ State 必須外部持久化，且每次執行都需更新。
 - `depth`: 決定 evidence breadth 與 chunk size
 - `scope`: 決定系統範圍（`module`、`solution`、`system`）
 - `strictness`: 決定模糊容忍度與 evidence threshold
+- `change_mode`: 決定本次是維持 docs-only、增加 remediation planning，或允許有界 code alignment
 - targeted review 參數：決定 traversal、inventory 規模與 analysis reach
 
 ## 品質標準

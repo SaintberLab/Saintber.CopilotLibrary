@@ -1,6 +1,6 @@
 ---
 agent: docs.hybrid-reviewer
-description: 設計 Hybrid Architecture & Specification Review Pipeline，支援 FULL / PARTIAL review、state 持久化與分階段執行。
+description: 設計 Hybrid Architecture & Specification Review Pipeline；不直接盤點專案，也不修改 docs / code。
 ---
 
 Design an implementation-ready Hybrid Architecture & Specification Review Pipeline.
@@ -15,6 +15,7 @@ Design an implementation-ready Hybrid Architecture & Specification Review Pipeli
 - Include dependencies: `${input:include_dependencies=default:bounded}` (`none` | `direct` | `bounded` | `full`)
 - Boundary rules: `${input:boundary_rules=default:none}`
 - Excluded targets: `${input:excluded_targets=default:none}`
+- Change mode policy: `${input:change_mode_policy=default:docs-only-first}` (`docs-only-first` | `plan-allowed` | `apply-code-allowed`)
 - Additional constraints: `${input:constraints=default:none}`
 
 ## Task
@@ -24,6 +25,7 @@ Design a multi-stage, stateful review pipeline that:
 3. writes outputs to files
 4. executes in resumable chunks
 5. enforces review scope deterministically
+6. clearly separates docs-only review/reporting from optional remediation planning and code alignment
 
 ## Mandatory output sections
 1. System Overview
@@ -41,4 +43,5 @@ Design a multi-stage, stateful review pipeline that:
 - Do not rely on conversation memory.
 - Do not skip Phase 0 target resolution.
 - Do not allow inventory or analysis to expand beyond scope rules.
+- Do not directly review the current repository or apply fixes from this design prompt.
 - Make the result implementation-ready and file-oriented.
