@@ -37,6 +37,7 @@ These rules apply only to the Copilot maintenance toolchain itself - `copilot.ma
 - During normal maintenance (non-release), update `.copilot/` and `.github/` only; do not update `/templates/`.
 - When release is declared, sync `.github/` artifacts into `/templates/<module>/` by namespace, and keep repository-level Copilot governance artifacts in `/templates/` root as needed.
 - `.github/TOOLS.md` is deprecated and must not be generated. Tooling guide content must be maintained in module-level `README.md` files under `.copilot/<module>/README.md` and `/templates/<module>/README.md`.
+- The first paragraph immediately following the H1 title in each module README is consumed by the CLI `list` command as the module description. Keep this paragraph accurate when the module's purpose or capabilities change.
 - After every maintenance update, sync-update module-level `README.md` files if command behavior changes.
 - Domain-specific customization logic should be implemented in dedicated agents/prompts instead of being embedded into repository-wide maintenance instructions.
 - If the update target is not under `/.github/`, follow the authoring flow defined in `.copilot/README.md` (sources -> base -> composed -> publish).

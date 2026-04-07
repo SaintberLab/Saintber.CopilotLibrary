@@ -26,7 +26,7 @@
 
 ## CLI 安裝與維護命令
 - `npx @saintber/copilot-library list`
-  - 用途：列出目前可安裝的 module selectors；若目標專案已有 `.copilot-library/state.json`，也會顯示已追蹤的已安裝模組。
+  - 用途：列出所有可安裝的模組（含模組說明）；說明文字直接取自各模組 README 的第一段描述，確保與文件同步。若目標專案已有 `.copilot-library/state.json`，也會顯示已安裝的模組。
 - `npx @saintber/copilot-library remove --module <ns|all>`
   - 用途：依模組解除安裝；若使用 `all`，會完整移除所有已追蹤安裝內容並清除 `.copilot-library/` 狀態目錄；整個過程都不會刪除使用者原本的 `.github` 內容。
 - 補充：若為舊版安裝且尚未記錄 `installedFiles`，請先執行一次 `update` 再使用 `remove`，以確保安全解除安裝。

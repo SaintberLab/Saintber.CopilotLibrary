@@ -37,6 +37,7 @@ applyTo: ".github/instructions/copilot.maintenance.instructions.md,.github/agent
 - 一般維護（非 release）只更新 `.copilot/` 與 `.github/`，不得同步更新 `/templates/`。
 - 只有在 release 宣告後，才可依 namespace 將 `.github/` 內容同步到 `/templates/<module>/`，必要的 repository-level 維護檔可保留在 `/templates/` 根目錄。
 - `.github/TOOLS.md` 已廢止，不再產生。工具說明應維護在 module README：`.copilot/<module>/README.md` 與 `/templates/<module>/README.md`。
+- 每個 module README 中，緊接 H1 標題後的第一個段落文字，會被 CLI `list` 命令作為該模組的說明顯示；當模組用途或能力調整時，需同步更新此段落，確保說明準確。
 - 每次維護後，若命令行為變更，需同步更新 module README。
 - 具領域針對性的客製化邏輯，應放在專用 agent / prompt，而不是寫進 repository-wide 的共通維護 instruction。
 - 若目標不在 `/.github/`，需遵循 `.copilot/README.md` 定義的流程（sources -> base -> composed -> publish）。

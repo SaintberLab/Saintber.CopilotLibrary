@@ -52,7 +52,7 @@ tools: [execute/getTerminalOutput, execute/runInTerminal, read/readFile, edit, s
 10.5. 發布時同步移轉需求歷程檔中的 `[未發布]` 條目。
 10.6. 發布且指定版號時同步更新 `package.json` 的 `version`。
 10.7. 發布時依 namespace 將 `.github/` 同步至 `/templates/<module>/` 並更新 module README。
-11. 在行為變更時同步更新 module README。
+11. 在行為變更時同步更新 module README；特別是需確保緊接 H1 標題後的第一個描述段落保持準確，因為 CLI `list` 命令會讀取此段落作為模組說明顯示給使用者。
 12. 發布時提供完整 git 指令（`git add`、`git commit`、`git tag`、`git push`）。
 13. 回傳分段清楚的結果。
 

@@ -57,7 +57,7 @@ The following rules are mandatory whenever `copilot.maintainer` is used, even if
 10.5. If release is declared, migrate requirement history entries from `[未發布]` into the requested version section for each affected namespace history file.
 10.6. If release is declared with a target version, update `package.json` so its `version` field matches that release number before finishing publication steps.
 10.7. If release is declared, sync files from `.github/` to `/templates/<module>/` by namespace and update module README files in `/templates/<module>/README.md`.
-11. Sync-update module README files for behavior changes.
+11. Sync-update module README files for behavior changes. In particular, keep the first description paragraph immediately following the H1 title accurate, as it is consumed by the CLI `list` command to describe available modules.
 12. For release publication, provide complete git commands (`git add`, `git commit`, `git tag`, `git push`) with a complete commit message.
 13. Return clearly sectioned results for instruction, agent, prompt, skill, change summary, changelog update, module README update, release commands, and file update results.
 

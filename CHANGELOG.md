@@ -6,6 +6,11 @@
 
 ## [未發布]
 
+### 變更
+- `src/cli.js` `list` 命令：輸出改為只顯示頂層模組清單（不再列出子選擇器），並自動讀取各模組 README 第一段描述文字右對齊顯示；已安裝模組同樣只顯示模組名稱與說明。
+- `copilot.maintenance.instructions.md`：新增穩定規則——每個 module README 緊接 H1 標題後的第一段落為 CLI `list` 模組說明，模組用途/能力變更時需同步保持準確。
+- `copilot.maintainer.agent.md`：工作流程第 11 步補充，明確要求在行為變更時保持 module README 描述段落準確性。
+
 ---
 
 ## [0.2.1] - 2026-04-07

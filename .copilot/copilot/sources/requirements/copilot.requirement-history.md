@@ -12,6 +12,19 @@
 
 ## [未發布]
 
+### 2026-04-07 12 - cli-list-module-descriptions
+
+- Recorded At: `2026-04-07`
+- Change Summary: 優化 CLI `list` 命令，改為只顯示頂層模組（不再列出子選擇器），並自動從各模組 README 第一段讀取說明文字，對齊顯示；同步新增 instruction 規則——module README 緊接 H1 標題後的第一段描述為 CLI 消費來源，需保持準確；agent step 11 補充說明。
+- Affected Artifacts: `src/cli.js`, `src/cli.test.js`, `copilot.maintenance.instructions.md`, `copilot.maintainer.agent.md`, `.copilot/copilot/composed/instructions/copilot.maintenance.instructions.md`, `.copilot/copilot/composed/agents/copilot.maintainer.agent.md`, `.copilot/copilot/README.md`, `templates/copilot/README.md`, `CHANGELOG.md`, `copilot.requirement-history.md`
+
+```md
+請優化 /src/cli.js
+- list 命令應回應模組清單就好，不需要具體到每個檔案
+- list 命令回應的模組應有模組的簡易說明，最好與目前的 README.md 文件的模組說明整合
+- 允許調整目前的 maintain 流程，保持模組說明更新
+```
+
 ---
 
 ## [0.2.1]
