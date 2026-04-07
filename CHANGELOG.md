@@ -8,6 +8,37 @@
 
 ---
 
+## [0.2.1] - 2026-04-07
+
+### 新增
+
+- Module README 使用手冊（`.copilot/<module>/README.md`、`templates/<module>/README.md`），取代原有 TOOLS.md 單體說明，涵蓋 `code`、`copilot`、`docs`、`kb`、`migration`、`speckit` 六個命名空間，提供 agents / prompts / instructions / skills 的用途與使用案例。
+- `copilot.maintain-test.prompt.md`：臨時維護流程測試用 prompt（`.github/` 為英文版，`.copilot/composed/` 保留繁體中文版，驗證完成後應予移除）。
+
+### 變更
+
+**維護治理流程（copilot 模組）**
+
+- `copilot.maintain` 主流程改為 module 化 authoring 模型：需求歷程預設路徑改為 `.copilot/<module>/sources/requirements/`；維護更新寫入 `.copilot/<module>/base/` 與 `.copilot/<module>/composed/`；release 時同步至 `templates/<module>/`。
+- `copilot.maintenance.instructions.md`：`applyTo` 範圍收斂至自有維護產物，避免套件使用者自有規則或外部 vendor AI 誤觸維護流程。
+- `copilot.maintainer.agent.md`：核心維護治理內嵌至 agent，確保無論 `applyTo` 是否命中，English normalization、CHANGELOG / composed 同步規則仍強制生效。
+- `copilot.maintain.prompt.md`：新增委派契約規則，不得因 `applyTo` 未命中而略過 `copilot.maintainer` 完整維護治理。
+- `src/cli.js`：新增 module 化 templates 解析能力，支援 `templates/<module>/{agents|instructions|prompts|skills}` 並維持舊版根目錄模板相容。
+- `.copilot/README.md`、`README.md`：更新為 module 目錄結構與新維護流程說明。
+
+**架構文件工具（docs 模組）**
+
+- `docs.architecture-documenter.agent.md`、`docs.hybrid-reviewer.agent.md`、`docs.hybrid-review-executor.agent.md`：釐清三者職責差異，新增 `inventory_mode` / `change_mode` 控制參數。
+- `docs.architecture-review.prompt.md`、`docs.document-architecture.prompt.md`：新增 `inventory_mode` 與 `include_dependencies` 控制，支援完整 repository 架構盤點而無需修改 source code。
+- `docs.hybrid-review-execute.prompt.md`：新增 `change_mode`（`docs-only` | `docs-and-plan` | `apply-code`），明確區分僅產出報告、提出計畫與實際修正程式碼三種模式。
+- `docs.hybrid-review-executor.agent.md`：新增 `terminal/runInTerminal` 工具授權，允許執行 PowerShell 自行驗證結果（build / test / 檔案檢查）；補充 Verification rules 段落，明確禁止執行破壞性或影響共用基礎設施的命令。
+
+### 已移除
+
+- `.github/TOOLS.md`、`.copilot/composed/TOOLS.md`、`templates/TOOLS.md`：廢棄移除；工具說明改由各 module README 承接。
+
+---
+
 ## [0.2.0] - 2026-04-02
 
 ### 新增

@@ -16,6 +16,8 @@ const ROOT = resolve(__dirname, "..");
 const TEMPLATES_DIR = join(ROOT, "templates");
 const STATE_REL = ".copilot-library/state.json";
 const GITHUB_SUBDIR = ".github";
+const ARTIFACT_DIRS = ["agents", "instructions", "prompts", "skills"];
+const MODULE_DIRS = ["code", "copilot", "docs", "kb", "migration", "speckit"];
 
 function parseArgs(args) {
   const result = {};
@@ -59,34 +61,76 @@ function writeState(targetDir, patch = {}) {
   return state;
 }
 
-function matchesModules(filename, modules) {
+function matchesModules(selector, modules) {
   if (!modules || modules.length === 0) return true;
   return modules.some(
     (m) =>
-      filename === m ||
-      filename.startsWith(m + ".") ||
-      filename.startsWith(m + "-")
+      selector === m ||
+      selector.startsWith(m + ".") ||
+      selector.startsWith(m + "-")
   );
 }
 
-function collectFiles(dir, baseDir, modules) {
+function resolveTemplateEntry(relativePath) {
+  const normalized = relativePath.replace(/\\/g, "/");
+  const parts = normalized.split("/");
+
+  if (
+    parts.length === 3 &&
+    MODULE_DIRS.includes(parts[0]) &&
+    ARTIFACT_DIRS.includes(parts[1])
+  ) {
+    const filename = parts[2];
+    return {
+      sourceRelativePath: normalized,
+      destinationRelativePath: `${parts[1]}/${filename}`,
+      selector: getModuleSelectorFromFile(filename),
+    };
+  }
+
+  if (parts.length === 2 && ARTIFACT_DIRS.includes(parts[0])) {
+    const filename = parts[1];
+    return {
+      sourceRelativePath: normalized,
+      destinationRelativePath: normalized,
+      selector: getModuleSelectorFromFile(filename),
+    };
+  }
+
+  return null;
+}
+
+function collectTemplateEntries(dir, baseDir, modules) {
   const results = [];
   if (!existsSync(dir)) return results;
+
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name);
     if (entry.isDirectory()) {
-      results.push(...collectFiles(full, baseDir, modules));
-    } else if (matchesModules(entry.name, modules)) {
-      results.push(relative(baseDir, full).replace(/\\/g, "/"));
+      results.push(...collectTemplateEntries(full, baseDir, modules));
+      continue;
     }
+
+    const rel = relative(baseDir, full).replace(/\\/g, "/");
+    const resolved = resolveTemplateEntry(rel);
+    if (!resolved) continue;
+    if (!matchesModules(resolved.selector, modules)) continue;
+    results.push(resolved);
   }
-  return results;
+
+  // Deduplicate by destination path. Later entries win so module-scoped templates can override legacy root templates.
+  const dedup = new Map();
+  for (const item of results) {
+    dedup.set(item.destinationRelativePath, item);
+  }
+
+  return Array.from(dedup.values());
 }
 
-function copyFiles(files, srcBase, destBase) {
-  for (const f of files) {
-    const src = join(srcBase, f);
-    const dest = join(destBase, f);
+function copyFiles(entries, srcBase, destBase) {
+  for (const entry of entries) {
+    const src = join(srcBase, entry.sourceRelativePath);
+    const dest = join(destBase, entry.destinationRelativePath);
     mkdirSync(dirname(dest), { recursive: true });
     copyFileSync(src, dest);
   }
@@ -169,7 +213,9 @@ function removeFiles(files, destBase) {
 
 function resolveExpectedFiles(state, modules) {
   if (modules && modules.length > 0) {
-    return collectFiles(TEMPLATES_DIR, TEMPLATES_DIR, modules);
+    return collectTemplateEntries(TEMPLATES_DIR, TEMPLATES_DIR, modules).map(
+      (entry) => entry.destinationRelativePath
+    );
   }
 
   if (Array.isArray(state?.installedFiles) && state.installedFiles.length > 0) {
@@ -181,10 +227,14 @@ function resolveExpectedFiles(state, modules) {
     state.modules.length > 0 &&
     !state.modules.includes("all")
   ) {
-    return collectFiles(TEMPLATES_DIR, TEMPLATES_DIR, state.modules);
+    return collectTemplateEntries(TEMPLATES_DIR, TEMPLATES_DIR, state.modules).map(
+      (entry) => entry.destinationRelativePath
+    );
   }
 
-  return collectFiles(TEMPLATES_DIR, TEMPLATES_DIR, null);
+  return collectTemplateEntries(TEMPLATES_DIR, TEMPLATES_DIR, null).map(
+    (entry) => entry.destinationRelativePath
+  );
 }
 
 export async function run(argv) {
@@ -212,16 +262,21 @@ export async function run(argv) {
         return;
       }
       const previousState = readState(targetDir) ?? {};
-      const files = collectFiles(TEMPLATES_DIR, TEMPLATES_DIR, modules);
-      if (files.length === 0) {
+      const templateEntries = collectTemplateEntries(
+        TEMPLATES_DIR,
+        TEMPLATES_DIR,
+        modules
+      );
+      if (templateEntries.length === 0) {
         console.error(
           "Error: no files to install (templates may be empty or no files match --modules)"
         );
         process.exitCode = 1;
         return;
       }
+      const files = templateEntries.map((entry) => entry.destinationRelativePath);
       const destGithub = join(targetDir, GITHUB_SUBDIR);
-      copyFiles(files, TEMPLATES_DIR, destGithub);
+      copyFiles(templateEntries, TEMPLATES_DIR, destGithub);
       const installedFiles = mergeInstalledFiles(previousState.installedFiles, files);
       writeState(targetDir, {
         modules: mergeTrackedModules(previousState.modules, modules),
@@ -245,14 +300,19 @@ export async function run(argv) {
         );
       }
       const effectiveModules = modules;
-      const files = collectFiles(TEMPLATES_DIR, TEMPLATES_DIR, effectiveModules);
-      if (files.length === 0) {
+      const templateEntries = collectTemplateEntries(
+        TEMPLATES_DIR,
+        TEMPLATES_DIR,
+        effectiveModules
+      );
+      if (templateEntries.length === 0) {
         console.error("Error: no files to update");
         process.exitCode = 1;
         return;
       }
+      const files = templateEntries.map((entry) => entry.destinationRelativePath);
       const destGithub = join(targetDir, GITHUB_SUBDIR);
-      copyFiles(files, TEMPLATES_DIR, destGithub);
+      copyFiles(templateEntries, TEMPLATES_DIR, destGithub);
       const installedFiles = mergeInstalledFiles(state?.installedFiles, files);
       writeState(targetDir, {
         modules: mergeTrackedModules(state?.modules, effectiveModules),
@@ -313,13 +373,14 @@ export async function run(argv) {
     }
 
     case "list": {
-      const files = collectFiles(TEMPLATES_DIR, TEMPLATES_DIR, null);
-      if (files.length === 0) {
+      const entries = collectTemplateEntries(TEMPLATES_DIR, TEMPLATES_DIR, null);
+      if (entries.length === 0) {
         console.error("Error: no installable templates found");
         process.exitCode = 1;
         return;
       }
 
+      const files = entries.map((entry) => entry.destinationRelativePath);
       const selectors = collectModuleSelectors(files);
       console.log("Available module selectors:");
       for (const selector of selectors) {
