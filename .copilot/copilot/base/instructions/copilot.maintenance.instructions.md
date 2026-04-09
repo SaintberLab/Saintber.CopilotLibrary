@@ -12,6 +12,9 @@ These rules apply only to the Copilot maintenance toolchain itself - `copilot.ma
 # Stable Rules
 - Treat `.copilot/` as the authoring layer and `.github/` as the publish layer.
 - Organize `.copilot/` by module namespace. Canonical layout is `.copilot/<module>/sources/requirements`, `.copilot/<module>/base`, `.copilot/<module>/composed`.
+- `copilot-instructions.md` is a VS Code reserved filename but still belongs to the `copilot` module. Its canonical authoring paths are `.copilot/copilot/base/instructions/copilot-instructions.md` and `.copilot/copilot/composed/instructions/copilot-instructions.md`.
+- Do not create or maintain a parallel artifact track under `.copilot/copilot-instructions/**` for the same canonical artifact unless the user explicitly requests migration or compatibility handling.
+- If multiple candidate paths exist for the same namespace artifact, always update the canonical module path and explicitly report non-canonical paths as skipped.
 - Use this maintenance governance only for explicit maintenance or release work on the library's own Copilot artifacts.
 - Because the `applyTo` scope is intentionally narrow, `copilot.maintainer.agent.md` must also embed and enforce the same maintenance governance during execution; compliance must not rely on `applyTo` alone.
 - Keep instruction, agent, prompt, and skill responsibilities separated.
@@ -96,3 +99,4 @@ These rules apply only to the Copilot maintenance toolchain itself - `copilot.ma
 - Do not rewrite unrelated sections for style only.
 - Do not collapse instruction, agent, prompt, or skill into a single artifact.
 - Do not change old rules based on inference alone.
+- Do not dual-write the same artifact to both canonical and non-canonical `.copilot` paths in the same maintenance operation.

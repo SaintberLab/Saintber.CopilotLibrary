@@ -19,6 +19,8 @@ tools: [execute/getTerminalOutput, execute/runInTerminal, read/readFile, edit, s
 # 內嵌維護治理
 - `.copilot/` 為 authoring 層，`.github/` 為 publish 層。
 - authoring 必須使用 module 目錄：`.copilot/<module>/sources/requirements`、`.copilot/<module>/base`、`.copilot/<module>/composed`。
+- `copilot-instructions.md` 雖是保留檔名，但仍屬於 `copilot` module；只能使用 canonical 路徑：`.copilot/copilot/base/instructions/copilot-instructions.md` 與 `.copilot/copilot/composed/instructions/copilot-instructions.md`。
+- 若同一產物同時出現在 canonical 與 non-canonical 候選路徑（例如 `.copilot/copilot-instructions/**`），除非使用者明確要求遷移，否則只能更新 canonical，並回報 non-canonical 為 skipped。
 - instruction、agent、prompt、skill 維持職責分離，除非新需求明確改動，否則保留既有規則。
 - 涉及雙語時，以 English 進行 merge analysis 與 normalization；`.github/` 保持正規化內容，`.copilot/<module>/composed/` 保持完整繁中版本。
 - 每次維護需更新 `CHANGELOG.md`、保留原始需求至 namespace history，並在行為變動時同步更新 module README。
@@ -39,6 +41,7 @@ tools: [execute/getTerminalOutput, execute/runInTerminal, read/readFile, edit, s
 
 # 工作流程
 1. 讀取新需求並辨識明確變更點。
+1.2 編輯前先解析 canonical 產物路徑，並偵測 non-canonical 重複路徑，避免雙寫衝突。
 1.5. 以正式模板將原始需求寫入命名空間歷程檔（預設 module 路徑），依版本段落保存並反序記錄。
 2. 將需求轉為 English 以利 merge 與 normalization。
 3. 讀取現有 instruction、agent、prompt、skill。
@@ -52,7 +55,7 @@ tools: [execute/getTerminalOutput, execute/runInTerminal, read/readFile, edit, s
 10.5. 發布時同步移轉需求歷程檔中的 `[未發布]` 條目。
 10.6. 發布且指定版號時同步更新 `package.json` 的 `version`。
 10.7. 發布時依 namespace 將 `.github/` 同步至 `/templates/<module>/` 並更新 module README。
-11. 在行為變更時同步更新 module README。
+11. 在行為變更時同步更新 module README；特別是需確保緊接 H1 標題後的第一個描述段落保持準確，因為 CLI `list` 命令會讀取此段落作為模組說明顯示給使用者。
 12. 發布時提供完整 git 指令（`git add`、`git commit`、`git tag`、`git push`）。
 13. 回傳分段清楚的結果。
 
@@ -64,6 +67,7 @@ tools: [execute/getTerminalOutput, execute/runInTerminal, read/readFile, edit, s
 - 不將長期治理規則放進 prompt。
 - 不將角色流程放進 instruction（除非是全域穩定規則）。
 - 未明確宣告 release 與版號前，不得變更 `package.json` 版本。
+- 不得在同一次操作把同一份產物同時寫入 canonical 與 non-canonical `.copilot` 目錄。
 - `description` 使用繁體中文，技術名詞保留 English。
 
 # 輸出契約

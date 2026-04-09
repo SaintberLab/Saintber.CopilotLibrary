@@ -169,6 +169,30 @@ function collectModuleSelectors(files) {
   return Array.from(selectors).sort();
 }
 
+function readModuleDescription(module) {
+  const readmePath = join(TEMPLATES_DIR, module, "README.md");
+  if (!existsSync(readmePath)) return "";
+  try {
+    const content = readFileSync(readmePath, "utf8");
+    const lines = content.split("\n");
+    let foundTitle = false;
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!foundTitle) {
+        if (trimmed.startsWith("# ")) foundTitle = true;
+        continue;
+      }
+      if (trimmed && !trimmed.startsWith("#")) {
+        // Strip a leading `<word>` (module name in backticks) to avoid duplication
+        return trimmed.replace(/^`[^`]+`\s*/, "");
+      }
+    }
+    return "";
+  } catch {
+    return "";
+  }
+}
+
 function mergeInstalledFiles(previousFiles, nextFiles) {
   return Array.from(
     new Set([...(previousFiles ?? []), ...(nextFiles ?? [])])
@@ -373,26 +397,29 @@ export async function run(argv) {
     }
 
     case "list": {
-      const entries = collectTemplateEntries(TEMPLATES_DIR, TEMPLATES_DIR, null);
-      if (entries.length === 0) {
-        console.error("Error: no installable templates found");
-        process.exitCode = 1;
-        return;
-      }
-
-      const files = entries.map((entry) => entry.destinationRelativePath);
-      const selectors = collectModuleSelectors(files);
-      console.log("Available module selectors:");
-      for (const selector of selectors) {
-        console.log(`  - ${selector}`);
+      const maxLen = Math.max(...MODULE_DIRS.map((m) => m.length));
+      console.log("Available modules:");
+      for (const module of MODULE_DIRS) {
+        const description = readModuleDescription(module);
+        const pad = module.padEnd(maxLen);
+        const line = `  ${pad}  ${description ? `— ${description}` : ""}`;
+        console.log(line.trimEnd());
       }
 
       const targetDir = resolve(process.cwd(), opts.target || ".");
       const state = readState(targetDir);
       if (state?.installedFiles?.length) {
-        console.log("\nTracked installed module selectors in target:");
-        for (const selector of collectModuleSelectors(state.installedFiles)) {
-          console.log(`  - ${selector}`);
+        const installedModules = collectModuleSelectors(state.installedFiles).filter(
+          (s) => MODULE_DIRS.includes(s)
+        );
+        if (installedModules.length > 0) {
+          console.log("\nInstalled modules in target:");
+          for (const module of installedModules) {
+            const description = readModuleDescription(module);
+            const pad = module.padEnd(maxLen);
+            const line = `  ${pad}  ${description ? `— ${description}` : ""}`;
+            console.log(line.trimEnd());
+          }
         }
       }
       break;

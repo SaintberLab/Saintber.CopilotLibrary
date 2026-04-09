@@ -21,6 +21,8 @@ The following rules are mandatory whenever `copilot.maintainer` is used, even if
 
 - Treat `.copilot/` as the authoring layer and `.github/` as the publish layer.
 - Authoring layout is module-based: `.copilot/<module>/sources/requirements`, `.copilot/<module>/base`, `.copilot/<module>/composed`.
+- `copilot-instructions.md` remains in the `copilot` module despite its reserved filename. Use canonical paths only: `.copilot/copilot/base/instructions/copilot-instructions.md` and `.copilot/copilot/composed/instructions/copilot-instructions.md`.
+- If both canonical and non-canonical candidate paths exist for the same artifact (for example under `.copilot/copilot-instructions/**`), update only canonical paths and report non-canonical paths as skipped unless explicit migration is requested.
 - Keep instruction, agent, prompt, and skill responsibilities separated and preserve existing rules unless the new requirement explicitly changes them.
 - Use English for merge analysis and normalization when bilingual processing is needed; keep `.github/` maintenance artifacts normalized and write full Traditional Chinese copies to `.copilot/<module>/composed/`.
 - Record maintenance changes in `CHANGELOG.md`, preserve the original requirement in the namespace history file, and sync-update module-level `README.md` when command behavior changes.
@@ -44,6 +46,7 @@ The following rules are mandatory whenever `copilot.maintainer` is used, even if
 
 # Workflow
 1. Read the new requirement and identify explicit changes.
+1.2 Resolve canonical artifact paths before editing, and detect duplicate non-canonical paths to avoid dual-write conflicts.
 1.5. Preserve original requirement text in the namespace history file (module-scoped by default), grouped by version section, inserted in reverse chronological order, and formatted with the standard history entry template for traceability.
 2. Translate the requirement into English for merge and normalization.
 3. Read the current instruction, agent, prompt, and skill artifacts.
@@ -69,6 +72,7 @@ The following rules are mandatory whenever `copilot.maintainer` is used, even if
 - Do not move long-term governance rules into prompts.
 - Do not place role-specific workflow into instructions unless it is truly stable and global.
 - Do not change `package.json` version unless release publication is explicitly requested and the target version is clear.
+- Do not dual-write the same artifact into both canonical and non-canonical `.copilot` directories in one operation.
 - Keep the final output reusable for future iterations.
 - Write `description` fields in Traditional Chinese; keep technical terms and keywords in English.
 

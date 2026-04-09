@@ -29,6 +29,7 @@ When invoking the `copilot.maintainer` subagent, require it to:
 1. Read the Traditional Chinese requirement.
 1.5. Preserve original requirement text in the specified/default namespace history file (module-scoped by default), grouped by version section, recorded in reverse chronological order, and formatted using the standard history template for traceability.
 1.6. Regardless of whether the touched files are matched by `copilot.maintenance.instructions.md` `applyTo`, enforce the full maintenance governance embedded in `copilot.maintainer.agent.md` across all affected artifacts.
+1.7. Resolve canonical artifact paths before editing. For `copilot-instructions.md`, use only `.copilot/copilot/base/instructions/copilot-instructions.md` and `.copilot/copilot/composed/instructions/copilot-instructions.md`; if `.copilot/copilot-instructions/**` exists, report it as non-canonical and skip dual-write unless explicit migration is requested.
 2. Translate the requirement into English for merge analysis.
 3. Merge the new requirement into the existing instruction, agent, prompt, and skill artifacts.
 4. Avoid duplication.

@@ -12,6 +12,9 @@ applyTo: ".github/instructions/copilot.maintenance.instructions.md,.github/agent
 # 穩定規則
 - `.copilot/` 為 authoring 層，`.github/` 為 publish 層。
 - `.copilot/` 必須採用 module 化目錄：`.copilot/<module>/sources/requirements`、`.copilot/<module>/base`、`.copilot/<module>/composed`。
+- `copilot-instructions.md` 雖為 VS Code 保留檔名，仍屬於 `copilot` module；其 canonical authoring 路徑固定為 `.copilot/copilot/base/instructions/copilot-instructions.md` 與 `.copilot/copilot/composed/instructions/copilot-instructions.md`。
+- 除非使用者明確要求遷移或相容性處理，否則不得在 `.copilot/copilot-instructions/**` 建立或維護同一份產物的平行軌。
+- 若同一 namespace 產物出現多個候選路徑，必須只更新 canonical module 路徑，並在結果中明確標示 non-canonical 路徑為 skipped。
 - 僅在使用者明確要求維護本函式庫 Copilot 產物或執行 release 時，才套用此維護治理流程。
 - 因 `applyTo` 範圍被刻意收斂，`copilot.maintainer.agent.md` 也必須在執行時內嵌並強制套用相同維護治理；不可只依賴 `applyTo` 命中與否決定是否遵守規範。
 - instruction、agent、prompt、skill 必須維持職責分離。
@@ -37,6 +40,7 @@ applyTo: ".github/instructions/copilot.maintenance.instructions.md,.github/agent
 - 一般維護（非 release）只更新 `.copilot/` 與 `.github/`，不得同步更新 `/templates/`。
 - 只有在 release 宣告後，才可依 namespace 將 `.github/` 內容同步到 `/templates/<module>/`，必要的 repository-level 維護檔可保留在 `/templates/` 根目錄。
 - `.github/TOOLS.md` 已廢止，不再產生。工具說明應維護在 module README：`.copilot/<module>/README.md` 與 `/templates/<module>/README.md`。
+- 每個 module README 中，緊接 H1 標題後的第一個段落文字，會被 CLI `list` 命令作為該模組的說明顯示；當模組用途或能力調整時，需同步更新此段落，確保說明準確。
 - 每次維護後，若命令行為變更，需同步更新 module README。
 - 具領域針對性的客製化邏輯，應放在專用 agent / prompt，而不是寫進 repository-wide 的共通維護 instruction。
 - 若目標不在 `/.github/`，需遵循 `.copilot/README.md` 定義的流程（sources -> base -> composed -> publish）。
@@ -96,3 +100,4 @@ applyTo: ".github/instructions/copilot.maintenance.instructions.md,.github/agent
 - 不得僅為風格而重寫不相關段落。
 - 不得將 instruction、agent、prompt、skill 混成單一產物。
 - 不得僅憑推測更改舊規則。
+- 不得在同一次維護中，將同一份產物雙寫至 canonical 與 non-canonical `.copilot` 路徑。

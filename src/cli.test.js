@@ -41,13 +41,15 @@ async function captureRun(args) {
   }
 }
 
-test("list shows installable module selectors", async () => {
+test("list shows available modules with descriptions", async () => {
   const result = await captureRun(["list"]);
 
   assert.equal(result.exitCode, 0);
-  assert.match(result.stdout, /Available module selectors:/);
+  assert.match(result.stdout, /Available modules:/);
   assert.match(result.stdout, /copilot/);
-  assert.match(result.stdout, /migration\.dotnet-modernizer/);
+  assert.match(result.stdout, /migration/);
+  assert.match(result.stdout, /—/);
+  assert.doesNotMatch(result.stdout, /migration\.dotnet-modernizer/);
 });
 
 test("remove deletes only tracked installed module files and preserves user content", async () => {
