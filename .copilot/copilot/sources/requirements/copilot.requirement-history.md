@@ -12,6 +12,58 @@
 
 ## [未發布]
 
+## [0.2.2] - 2026-04-09
+
+### 2026-04-09 16 - release-0-2-2
+
+- Recorded At: `2026-04-09`
+- Change Summary: 依使用者要求發布 `v0.2.2`，將 `CHANGELOG.md` 與需求歷程中的 `[未發布]` 條目封版至 `0.2.2`、更新 `package.json` 版本，並將 `.github/` 產物依 namespace 同步到 `templates/<module>/`。
+- Affected Artifacts: `CHANGELOG.md`, `package.json`, `copilot.requirement-history.md`, `templates/<module>/**`
+
+```md
+請發布為 v0.2.2
+```
+
+---
+
+### 2026-04-09 15 - cleanup-non-canonical-copilot-instructions-folder
+
+- Recorded At: `2026-04-09`
+- Change Summary: 依使用者要求執行清理，移除 non-canonical `.copilot/copilot-instructions/**` 目錄，避免與 canonical `.copilot/copilot/**` 並存造成維護與路徑判斷誤差。
+- Affected Artifacts: `.copilot/copilot-instructions/**`, `CHANGELOG.md`, `copilot.requirement-history.md`
+
+```md
+請協助清理
+```
+
+---
+
+### 2026-04-09 14 - enforce-canonical-copilot-instructions-path
+
+- Recorded At: `2026-04-09`
+- Change Summary: 補強維護治理規範，明確要求 `copilot-instructions.md` 雖為保留檔名但仍屬 `copilot` module，僅允許更新 `.copilot/copilot/base|composed/instructions/` canonical 路徑；若偵測 `.copilot/copilot-instructions/**` 等 non-canonical 路徑，預設標記為 skipped 並禁止雙寫，避免誤判與路徑分叉。
+- Affected Artifacts: `copilot.maintenance.instructions.md`, `copilot.maintainer.agent.md`, `copilot.maintain.prompt.md`, `.copilot/copilot/base/instructions/copilot.maintenance.instructions.md`, `.copilot/copilot/composed/instructions/copilot.maintenance.instructions.md`, `.copilot/copilot/base/agents/copilot.maintainer.agent.md`, `.copilot/copilot/composed/agents/copilot.maintainer.agent.md`, `.copilot/copilot/base/prompts/copilot.maintain.prompt.md`, `.copilot/copilot/composed/prompts/copilot.maintain.prompt.md`, `.copilot/copilot/README.md`, `CHANGELOG.md`, `copilot.requirement-history.md`
+
+```md
+剛剛的修正中， /.copilot/copilot 與  /.copilot/copilot-instructions 同時產生了 copilot-instructions 的文件，這兩個目錄是否容易引起誤判？是否要合併在同一個目錄就好？或是需要加上什麼 instructions 規範或調整 agnet 來避免發生這件事？
+```
+
+---
+
+### 2026-04-09 13 - translate-copilot-instructions-and-strengthen-language-policy
+
+- Recorded At: `2026-04-09`
+- Change Summary: 將 `copilot-instructions.md` 轉為英文版規範內容，並強化語言規則：所有會話必須使用繁體中文（zh-TW）；除非使用者明確要求，所有文件輸出預設皆為繁體中文，專有名詞與關鍵字可保留英文。
+- Affected Artifacts: `.github/instructions/copilot-instructions.md`, `.copilot/copilot/base/instructions/copilot-instructions.md`, `.copilot/copilot/composed/instructions/copilot-instructions.md`, `.copilot/copilot-instructions/base/instructions/copilot-instructions.md`, `CHANGELOG.md`, `copilot.requirement-history.md`
+
+```md
+請翻譯 #file:copilot-instructions 為英文版本，並補充內容：
+- 請強調：All conversations MUST be conducted in Traditional Chinese (zh-TW)
+- 請強調：除非使用者明確要求，否則所有產出文件一律使用繁體中文(zh-TW)，專有名詞與關鍵字除外
+```
+
+---
+
 ### 2026-04-07 12 - cli-list-module-descriptions
 
 - Recorded At: `2026-04-07`

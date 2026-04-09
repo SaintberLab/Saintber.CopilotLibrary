@@ -7,6 +7,8 @@
   - 用途：instruction / agent / prompt / skill 的職責邊界、合併規則、輸出規範。
 - `copilot-instructions.md`（VS Code 保留檔名）
   - 用途：全域規則（語言規範、任務清單與通用互動規則）。
+  - canonical authoring 路徑：`.copilot/copilot/base/instructions/copilot-instructions.md` 與 `.copilot/copilot/composed/instructions/copilot-instructions.md`。
+  - 注意：`.copilot/copilot-instructions/**` 非 canonical module 路徑，除非明確要求遷移，維護流程不應雙寫該路徑。
 
 ## Agents
 - `copilot.maintainer`
@@ -18,7 +20,7 @@
 
 ## Prompts（Slash Commands）
 - `/copilot.maintain`
-  - 說明：從新的繁體中文需求更新 instruction / agent / prompt / skill；可在宣告 release 時同步封版 CHANGELOG、同步更新 `package.json` 版號、同步 `.github/` 至 `/templates/` 部署目錄並產出 git 發布命令；自動以正式模板保存原始需求至 `.copilot/sources/updates/<namespace>/<namespace>.requirement-history.md`，依版本反序累積，並在發布時移轉至正式版本段落。
+  - 說明：從新的繁體中文需求更新 instruction / agent / prompt / skill；可在宣告 release 時同步封版 CHANGELOG、同步更新 `package.json` 版號、同步 `.github/` 至 `/templates/` 部署目錄並產出 git 發布命令；自動以正式模板保存原始需求至 `.copilot/<module>/sources/requirements/<namespace>.requirement-history.md`，依版本反序累積，並在發布時移轉至正式版本段落。
   - 對應 Agent：`copilot.maintainer`
 - `/copilot.apply-speckit-customizations`
   - 說明：以使用者專案適用的輕量流程，將 Speckit 客製意圖改寫為精確 overlay 規格並重套到最新上游產物；預設不依賴 `/copilot.maintain` 或複雜 changelog/release 流程。

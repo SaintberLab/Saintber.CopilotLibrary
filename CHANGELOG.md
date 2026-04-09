@@ -7,6 +7,16 @@
 ## [未發布]
 
 ### 變更
+
+---
+
+## [0.2.2] - 2026-04-09
+
+### 變更
+- 清理 non-canonical 路徑：移除 `.copilot/copilot-instructions/**`，避免與 canonical `.copilot/copilot/**` 並存造成維護流程誤判與雙軌更新風險。
+- `copilot.maintenance.instructions.md`、`copilot.maintainer.agent.md`、`copilot.maintain.prompt.md`：新增 canonical 路徑治理，明確規範 `copilot-instructions.md` 只能維護於 `.copilot/copilot/base|composed/instructions/`；若偵測 `.copilot/copilot-instructions/**` 等 non-canonical 路徑，必須標記為 skipped 並禁止雙寫。
+- `.copilot/copilot/README.md`：補充 `copilot-instructions.md` 的 canonical authoring 路徑說明，並將需求歷程預設路徑示例更新為 module 化結構（`.copilot/<module>/sources/requirements/`）。
+- `copilot-instructions.md`：內容改為英文版，並強化語言規則：所有對話過程必須使用繁體中文（zh-TW）；除非使用者明確要求其他語言，文件輸出預設為繁體中文，專有名詞與關鍵字可保留英文。
 - `src/cli.js` `list` 命令：輸出改為只顯示頂層模組清單（不再列出子選擇器），並自動讀取各模組 README 第一段描述文字右對齊顯示；已安裝模組同樣只顯示模組名稱與說明。
 - `copilot.maintenance.instructions.md`：新增穩定規則——每個 module README 緊接 H1 標題後的第一段落為 CLI `list` 模組說明，模組用途/能力變更時需同步保持準確。
 - `copilot.maintainer.agent.md`：工作流程第 11 步補充，明確要求在行為變更時保持 module README 描述段落準確性。

@@ -26,6 +26,7 @@ status: active
 1. 讀取繁中需求。
 1.5. 在指定或預設命名空間歷程檔保留原始需求文本（預設 module 路徑），依版本段落保存並反序寫入正式模板。
 1.6. 不論 touched files 是否被 `applyTo` 命中，都必須對所有受影響產物強制套用 `copilot.maintainer.agent.md` 內嵌治理。
+1.7. 編輯前先解析 canonical 路徑。`copilot-instructions.md` 只能寫入 `.copilot/copilot/base/instructions/copilot-instructions.md` 與 `.copilot/copilot/composed/instructions/copilot-instructions.md`；若偵測到 `.copilot/copilot-instructions/**`，除非使用者明確要求遷移，否則標記為 non-canonical 並略過雙寫。
 2. 先轉為 English 再做 merge analysis。
 3. 合併至 instruction、agent、prompt、skill。
 4. 避免重複。
