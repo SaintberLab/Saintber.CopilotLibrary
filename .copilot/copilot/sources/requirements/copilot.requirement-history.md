@@ -12,6 +12,19 @@
 
 ## [未發布]
 
+### 2026-04-10 17 - fix-copilot-instructions-install-path
+
+- Recorded At: `2026-04-10`
+- Change Summary: 修正 CLI 安裝邏輯：`copilot-instructions.md` 現在正確安裝到 `.github/` 根目錄而非 `.github/instructions/` 子目錄，符合 VS Code Copilot 產物載入機制。其他 instructions 檔案（`*.maintenance.instructions.md`、`code.*.instructions.md` 等）維持安裝到 `.github/instructions/` 子目錄。
+- Affected Artifacts: `src/cli.js`, `CHANGELOG.md`, `copilot.requirement-history.md`
+
+```md
+- 請修正 #file:cli.js ，或修正  #file:copilot.maintainer.agent.md ，copilot-instructions.md 的安裝位置應該是在 /.github/ 目錄下而不是放下 .github/instructions 目錄下
+- 若其他 instructions 也是要放在 .github 目錄下才會生效，請一併修正安裝規則
+```
+
+---
+
 ## [0.2.2] - 2026-04-09
 
 ### 2026-04-09 16 - release-0-2-2

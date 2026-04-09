@@ -75,12 +75,21 @@ function resolveTemplateEntry(relativePath) {
   const normalized = relativePath.replace(/\\/g, "/");
   const parts = normalized.split("/");
 
+  // Special case: copilot-instructions.md belongs in .github root, not .github/instructions
+  const filename = parts[parts.length - 1];
+  if (filename === "copilot-instructions.md") {
+    return {
+      sourceRelativePath: normalized,
+      destinationRelativePath: "copilot-instructions.md",
+      selector: getModuleSelectorFromFile(filename),
+    };
+  }
+
   if (
     parts.length === 3 &&
     MODULE_DIRS.includes(parts[0]) &&
     ARTIFACT_DIRS.includes(parts[1])
   ) {
-    const filename = parts[2];
     return {
       sourceRelativePath: normalized,
       destinationRelativePath: `${parts[1]}/${filename}`,
@@ -89,7 +98,6 @@ function resolveTemplateEntry(relativePath) {
   }
 
   if (parts.length === 2 && ARTIFACT_DIRS.includes(parts[0])) {
-    const filename = parts[1];
     return {
       sourceRelativePath: normalized,
       destinationRelativePath: normalized,
@@ -130,9 +138,12 @@ function collectTemplateEntries(dir, baseDir, modules) {
 function copyFiles(entries, srcBase, destBase) {
   for (const entry of entries) {
     const src = join(srcBase, entry.sourceRelativePath);
-    const dest = join(destBase, entry.destinationRelativePath);
-    mkdirSync(dirname(dest), { recursive: true });
-    copyFileSync(src, dest);
+    // For .github root files (like copilot-instructions.md), copy directly to destBase
+    const finalDest = entry.destinationRelativePath.includes("/")
+      ? join(destBase, entry.destinationRelativePath)
+      : join(destBase, entry.destinationRelativePath);
+    mkdirSync(dirname(finalDest), { recursive: true });
+    copyFileSync(src, finalDest);
   }
 }
 

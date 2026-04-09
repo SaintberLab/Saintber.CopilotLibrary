@@ -7,6 +7,7 @@
 ## [未發布]
 
 ### 變更
+- `src/cli.js`：修正 `resolveTemplateEntry` 路徑邏輯，確保 `copilot-instructions.md` 安裝到 `.github/`（root），而其他 instructions 維持安裝到 `.github/instructions/` 子目錄，符合 VS Code Copilot 產物發現機制。
 
 ---
 
