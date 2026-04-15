@@ -33,6 +33,7 @@ npx @saintber/copilot-library remove --module all
 
 - `init`：把套件內 templates 內容安裝到 `target/.github`，並建立 `.copilot-library/state.json`。
 - `update`：把最新 templates 內容覆蓋更新到 `target/.github`，並更新 state。
+- `copilot-instructions` 特例：若 `target/.github/copilot-instructions.md` 不存在，會直接建立在根目錄；若已存在，則改安裝到 `target/.github/instructions/copilot-instructions.md` 供後續合併，避免覆蓋既有根檔內容。
 - `doctor`：檢查目標目錄、state 檔案、安裝版本與目標檔案缺漏；若 state 內有安裝清單，會優先依安裝清單檢查。
 - `list`：列出目前可安裝的 module selectors；若目標專案已有 state，也會顯示已追蹤的已安裝模組。
 - `remove`：依 `--module` 解除安裝指定模組；若使用 `--module all`，會完整移除所有已追蹤安裝內容，並刪除 `.copilot-library/` 狀態目錄，但不會碰觸使用者原本未由本工具安裝的 `.github` 內容。

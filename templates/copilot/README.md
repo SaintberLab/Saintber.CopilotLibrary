@@ -25,6 +25,9 @@
 - `/copilot.apply-speckit-customizations`
   - 說明：以使用者專案適用的輕量流程，將 Speckit 客製意圖改寫為精確 overlay 規格並重套到最新上游產物；預設不依賴 `/copilot.maintain` 或複雜 changelog/release 流程。
   - 對應 Agent：`copilot.speckit-customizer`
+- `/copilot.merge-copilot-instructions`
+  - 說明：將 `.github/instructions/copilot-instructions.md` 去重後合併到 `.github/copilot-instructions.md`；若目標不存在，直接以來源內容建立目標檔。
+  - 對應 Agent：`copilot.maintainer`
 
 ## CLI 安裝與維護命令
 - `npx @saintber/copilot-library list`

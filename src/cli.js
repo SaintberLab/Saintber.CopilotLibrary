@@ -18,6 +18,8 @@ const STATE_REL = ".copilot-library/state.json";
 const GITHUB_SUBDIR = ".github";
 const ARTIFACT_DIRS = ["agents", "instructions", "prompts", "skills"];
 const MODULE_DIRS = ["code", "copilot", "docs", "kb", "migration", "speckit"];
+const COPILOT_INSTRUCTIONS_FILENAME = "copilot-instructions.md";
+const COPILOT_INSTRUCTIONS_STAGED_PATH = `instructions/${COPILOT_INSTRUCTIONS_FILENAME}`;
 
 function parseArgs(args) {
   const result = {};
@@ -75,12 +77,13 @@ function resolveTemplateEntry(relativePath) {
   const normalized = relativePath.replace(/\\/g, "/");
   const parts = normalized.split("/");
 
-  // Special case: copilot-instructions.md belongs in .github root, not .github/instructions
+  // Stage copilot-instructions under .github/instructions by default.
+  // During copy, it may be promoted to .github root when target root file does not exist.
   const filename = parts[parts.length - 1];
-  if (filename === "copilot-instructions.md") {
+  if (filename === COPILOT_INSTRUCTIONS_FILENAME) {
     return {
       sourceRelativePath: normalized,
-      destinationRelativePath: "copilot-instructions.md",
+      destinationRelativePath: COPILOT_INSTRUCTIONS_STAGED_PATH,
       selector: getModuleSelectorFromFile(filename),
     };
   }
@@ -135,16 +138,30 @@ function collectTemplateEntries(dir, baseDir, modules) {
   return Array.from(dedup.values());
 }
 
+function resolveDestinationPath(entry, destBase) {
+  if (entry.destinationRelativePath !== COPILOT_INSTRUCTIONS_STAGED_PATH) {
+    return entry.destinationRelativePath;
+  }
+
+  const rootInstructionsPath = join(destBase, COPILOT_INSTRUCTIONS_FILENAME);
+  return existsSync(rootInstructionsPath)
+    ? COPILOT_INSTRUCTIONS_STAGED_PATH
+    : COPILOT_INSTRUCTIONS_FILENAME;
+}
+
 function copyFiles(entries, srcBase, destBase) {
+  const copiedPaths = [];
+
   for (const entry of entries) {
     const src = join(srcBase, entry.sourceRelativePath);
-    // For .github root files (like copilot-instructions.md), copy directly to destBase
-    const finalDest = entry.destinationRelativePath.includes("/")
-      ? join(destBase, entry.destinationRelativePath)
-      : join(destBase, entry.destinationRelativePath);
+    const destinationRelativePath = resolveDestinationPath(entry, destBase);
+    const finalDest = join(destBase, destinationRelativePath);
     mkdirSync(dirname(finalDest), { recursive: true });
     copyFileSync(src, finalDest);
+    copiedPaths.push(destinationRelativePath);
   }
+
+  return copiedPaths;
 }
 
 function getFilenameFromRelativePath(filePath) {
@@ -309,15 +326,17 @@ export async function run(argv) {
         process.exitCode = 1;
         return;
       }
-      const files = templateEntries.map((entry) => entry.destinationRelativePath);
       const destGithub = join(targetDir, GITHUB_SUBDIR);
-      copyFiles(templateEntries, TEMPLATES_DIR, destGithub);
-      const installedFiles = mergeInstalledFiles(previousState.installedFiles, files);
+      const copiedFiles = copyFiles(templateEntries, TEMPLATES_DIR, destGithub);
+      const installedFiles = mergeInstalledFiles(
+        previousState.installedFiles,
+        copiedFiles
+      );
       writeState(targetDir, {
         modules: mergeTrackedModules(previousState.modules, modules),
         installedFiles,
       });
-      console.log(`✓ Installed ${files.length} file(s) to ${destGithub}`);
+      console.log(`✓ Installed ${copiedFiles.length} file(s) to ${destGithub}`);
       break;
     }
 
@@ -345,15 +364,14 @@ export async function run(argv) {
         process.exitCode = 1;
         return;
       }
-      const files = templateEntries.map((entry) => entry.destinationRelativePath);
       const destGithub = join(targetDir, GITHUB_SUBDIR);
-      copyFiles(templateEntries, TEMPLATES_DIR, destGithub);
-      const installedFiles = mergeInstalledFiles(state?.installedFiles, files);
+      const copiedFiles = copyFiles(templateEntries, TEMPLATES_DIR, destGithub);
+      const installedFiles = mergeInstalledFiles(state?.installedFiles, copiedFiles);
       writeState(targetDir, {
         modules: mergeTrackedModules(state?.modules, effectiveModules),
         installedFiles,
       });
-      console.log(`✓ Updated ${files.length} file(s) in ${destGithub}`);
+      console.log(`✓ Updated ${copiedFiles.length} file(s) in ${destGithub}`);
       break;
     }
 

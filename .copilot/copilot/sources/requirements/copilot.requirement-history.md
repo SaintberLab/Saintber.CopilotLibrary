@@ -12,6 +12,29 @@
 
 ## [未發布]
 
+### 2026-04-15 18 - copilot-instructions-safe-install-and-merge-prompt
+
+- Recorded At: `2026-04-15`
+- Change Summary: 調整 CLI 安裝策略採用安全雙軌：若目標專案不存在 `.github/copilot-instructions.md` 則直接安裝到 root；若已存在則改安裝到 `.github/instructions/copilot-instructions.md` 以避免覆蓋。另新增 `/copilot.merge-copilot-instructions` prompt，負責將 staged 指示去重後合併到 root 生效檔。
+- Affected Artifacts: `src/cli.js`, `src/cli.test.js`, `.github/prompts/copilot.merge-copilot-instructions.prompt.md`, `.copilot/copilot/base/prompts/copilot.merge-copilot-instructions.prompt.md`, `.copilot/copilot/composed/prompts/copilot.merge-copilot-instructions.prompt.md`, `.copilot/copilot/README.md`, `templates/copilot/README.md`, `README.md`, `CHANGELOG.md`, `copilot.requirement-history.md`
+
+```md
+Follow instructions in #prompt:copilot.maintain.prompt.md with these arguments: 目的：調整 copilot-instructions 安裝方法與更新方法
+
+問題：
+- 以目前規則， copilot-instructions 會直接安裝到 /.github，但如果使用者已有現有的 copilot-instructions，只能覆蓋會停止安裝
+- 按照目前 vscode 的設計，copilot-instructions 要安裝在 /.github 才能保證生效(如果不是，請糾正我並中斷執行)
+
+需求：
+- 調整 #file:cli.js ，取消安裝 copilot-instructions 到 /.github 目錄，改安裝到 /.github/instructions
+- 新增一個 prompt，負責去重、合併 /.github/instructions/copilot-instructions 至 /.github/copilot-instructions，若目標不存在則直接由來源(/.github/instructions/copilot-instructions)取代
+- 若以上問題有更好的解決辦法或模糊不清，請先提出與我討論再執行
+
+採用 2，不存在直接複製，存在再用 prompt 合併
+```
+
+---
+
 ### 2026-04-10 17 - fix-copilot-instructions-install-path
 
 - Recorded At: `2026-04-10`

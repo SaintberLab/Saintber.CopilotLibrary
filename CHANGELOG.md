@@ -7,7 +7,11 @@
 ## [未發布]
 
 ### 變更
-- `src/cli.js`：修正 `resolveTemplateEntry` 路徑邏輯，確保 `copilot-instructions.md` 安裝到 `.github/`（root），而其他 instructions 維持安裝到 `.github/instructions/` 子目錄，符合 VS Code Copilot 產物發現機制。
+- `src/cli.js`：調整 `copilot-instructions.md` 安裝策略為安全雙軌：若目標專案 `.github/copilot-instructions.md` 不存在，直接安裝到 `.github/` root；若已存在，改安裝到 `.github/instructions/copilot-instructions.md`，避免覆蓋既有根檔並保留後續合併空間。
+- `src/cli.js`：`copyFiles` 改為回傳實際落地路徑，`init/update` 以實際路徑寫入 state，確保 `doctor/remove` 對 staged 與 root 兩種路徑都能正確追蹤。
+- `src/cli.test.js`：新增 2 個測試，驗證 `copilot-instructions.md` 在「目標根檔不存在」與「目標根檔已存在」兩種情境下的安裝與 state 追蹤行為。
+- 新增 `.github/prompts/copilot.merge-copilot-instructions.prompt.md`（及 `.copilot/copilot/base|composed` 對應檔）：提供去重/合併流程，將 `.github/instructions/copilot-instructions.md` 合併到 `.github/copilot-instructions.md`；若目標不存在則直接建立。
+- `README.md`、`.copilot/copilot/README.md`、`templates/copilot/README.md`：補充新安裝策略與新 prompt 說明。
 
 ---
 

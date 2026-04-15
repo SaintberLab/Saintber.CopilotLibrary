@@ -52,6 +52,62 @@ test("list shows available modules with descriptions", async () => {
   assert.doesNotMatch(result.stdout, /migration\.dotnet-modernizer/);
 });
 
+test("init installs copilot-instructions to .github root when target root file is absent", async () => {
+  const targetDir = mkdtempSync(join(tmpdir(), "copilot-library-"));
+
+  const initResult = await captureRun([
+    "init",
+    "--target",
+    targetDir,
+    "--module",
+    "copilot",
+  ]);
+
+  assert.equal(initResult.exitCode, 0);
+  assert.equal(existsSync(join(targetDir, ".github", "copilot-instructions.md")), true);
+  assert.equal(
+    existsSync(join(targetDir, ".github", "instructions", "copilot-instructions.md")),
+    false
+  );
+
+  const state = JSON.parse(
+    readFileSync(join(targetDir, ".copilot-library", "state.json"), "utf8")
+  );
+  assert.ok(state.installedFiles.includes("copilot-instructions.md"));
+});
+
+test("init stages copilot-instructions under .github/instructions when root file already exists", async () => {
+  const targetDir = mkdtempSync(join(tmpdir(), "copilot-library-"));
+  mkdirSync(join(targetDir, ".github"), { recursive: true });
+  writeFileSync(
+    join(targetDir, ".github", "copilot-instructions.md"),
+    "# existing\nkeep\n"
+  );
+
+  const initResult = await captureRun([
+    "init",
+    "--target",
+    targetDir,
+    "--module",
+    "copilot",
+  ]);
+
+  assert.equal(initResult.exitCode, 0);
+  assert.equal(
+    readFileSync(join(targetDir, ".github", "copilot-instructions.md"), "utf8"),
+    "# existing\nkeep\n"
+  );
+  assert.equal(
+    existsSync(join(targetDir, ".github", "instructions", "copilot-instructions.md")),
+    true
+  );
+
+  const state = JSON.parse(
+    readFileSync(join(targetDir, ".copilot-library", "state.json"), "utf8")
+  );
+  assert.ok(state.installedFiles.includes("instructions/copilot-instructions.md"));
+});
+
 test("remove deletes only tracked installed module files and preserves user content", async () => {
   const targetDir = mkdtempSync(join(tmpdir(), "copilot-library-"));
   mkdirSync(join(targetDir, ".github"), { recursive: true });
