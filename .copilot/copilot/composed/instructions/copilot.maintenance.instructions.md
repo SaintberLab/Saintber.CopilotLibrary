@@ -33,6 +33,31 @@ applyTo: ".github/instructions/copilot.maintenance.instructions.md,.github/agent
 - 同一版本段落中的需求條目必須以反序記錄，讓迭代歷程可直接由新到舊追溯。
 - 若未提供版本號，則將需求記錄於歷程檔中的 `[未發布]` 段落。
 - 需求歷程條目應採正式模板，至少包含：`Recorded At`、`Change Summary`、`Affected Artifacts`、`Original Requirement`。
+- 對於需被多個 agent/prompt 共用的原始需求記錄能力，預設應採 dedicated skill 作為主要 AI 操作，並以單一操作搭配模式參數化，避免拆成多段 handoff 流程。
+- 為節省 GitHub Copilot（by request）usage，預設採直接執行，避免不必要的 subagent handoff。
+- 可重用需求記錄器應支援三種模式並共用單一參數契約：
+	- `chronological`（預設）：無版號記錄。
+	- `versioned-basic`：有版號、無固定本文格式。
+	- `versioned-structured`：有版號、含固定本文格式。
+- 除非使用者外部需求明確覆寫，需求記錄器根目錄預設為 `/docs/histories`。
+- 若使用者輸入已明確指定保存路徑、歷程表格或記錄版型，必須以外部需求優先，預設值僅作 fallback。
+- `chronological` 預設行為：
+	- 反序保留原始需求。
+	- 文件頂部維護反序歷程表，欄位為 `Time`、`Requirement Summary`。
+	- 預設路徑格式：`<root>/<yyyy>/<MM>/History_<yyyy-MM-dd>.md`。
+- `versioned-basic` 預設行為：
+	- 反序保留原始需求。
+	- 文件頂部維護反序歷程表，欄位為 `Version`、`Date`、`Summary`。
+	- 未指定版本號時，使用 `Draft.<sequence>`。
+	- 明確發布到 `<version>` 時，將所有 `Draft.<sequence>` 移轉為 `<version>.<sequence>`。
+	- 未指定保存路徑時，預設為：`<root>/v<major>/v<major>.<minor>/.../History-<major>.<minor>.<patch>.md`。
+- `versioned-structured` 預設行為：
+	- 反序保留原始需求。
+	- 文件頂部維護反序歷程表，欄位為 `Version`、`Date`、`Trigger`、`Summary`。
+	- 未指定版本號時，使用 `Draft.<sequence>`。
+	- 明確發布到 `<version>` 時，將所有 `Draft.<sequence>` 移轉為 `<version>.<sequence>`。
+	- 記錄本文需包含：`Trigger`（中文欄位名）、`Background`、`Requirements`、`Original Input`。
+	- 未指定保存路徑時，與 `versioned-basic` 相同。
 - 當使用者明確宣告發布新版時，需將 `[未發布]` 內容移入目標版本段，並保留新的空白 `[未發布]` 區塊供下一輪累積。
 - 發布新版時，也必須將各 namespace 歷程檔中 `[未發布]` 的需求條目一併移入對應正式版本段落，並保留新的空白 `[未發布]` 段落。
 - 若發布時有指定目標版號，必須在同一次發布流程中同步更新 repository `package.json` 的 `version` 欄位為相同版號。

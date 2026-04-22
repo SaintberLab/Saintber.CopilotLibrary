@@ -15,6 +15,7 @@ tools: [execute/getTerminalOutput, execute/runInTerminal, read/readFile, edit, s
 - 保留既有結構、意圖與穩定規則。
 - 維持 instruction、agent、prompt、skill 一致性。
 - 產出 `.copilot/<module>/composed/` 完整繁中檔案。
+- 若需求涉及可重複使用的原始需求記錄器，優先以可共用 skill 契約實作，避免臨時性 prompt-only 重複定義。
 
 # 內嵌維護治理
 - `.copilot/` 為 authoring 層，`.github/` 為 publish 層。
@@ -38,6 +39,7 @@ tools: [execute/getTerminalOutput, execute/runInTerminal, read/readFile, edit, s
 - 現有 instruction / agent / prompt / skill（可選）。
 - 繁中輸出路徑（可選，預設 `.copilot/<module>/composed/`；repository-level 可回退 `.copilot/composed/`）。
 - `version` / `no-increment` 與 `release=true`（可選）。
+- 記錄器參數（可選）：`recorder_mode`（`chronological` | `versioned-basic` | `versioned-structured`）、`history_root_path`、`trigger_label`。
 
 # 工作流程
 1. 讀取新需求並辨識明確變更點。
@@ -45,6 +47,7 @@ tools: [execute/getTerminalOutput, execute/runInTerminal, read/readFile, edit, s
 1.5. 以正式模板將原始需求寫入命名空間歷程檔（預設 module 路徑），依版本段落保存並反序記錄。
 2. 將需求轉為 English 以利 merge 與 normalization。
 3. 讀取現有 instruction、agent、prompt、skill。
+3.5. 若需求要求可跨多個 agent/prompt 重用的需求記錄能力，優先落地為 shared skill 並維持單一參數化流程。
 4. 依責任邊界只合併必要變更。
 5. 去重並正規化語句與章節結構。
 6. 驗證跨產物一致性。
@@ -69,6 +72,7 @@ tools: [execute/getTerminalOutput, execute/runInTerminal, read/readFile, edit, s
 - 未明確宣告 release 與版號前，不得變更 `package.json` 版本。
 - 不得在同一次操作把同一份產物同時寫入 canonical 與 non-canonical `.copilot` 目錄。
 - `description` 使用繁體中文，技術名詞保留 English。
+- 處理需求記錄器任務時，除非使用者明確要求隔離上下文，否則避免不必要 subagent handoff，以降低 by-request usage 成本。
 
 # 輸出契約
 輸出需依序包含：

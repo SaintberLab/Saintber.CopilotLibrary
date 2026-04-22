@@ -12,6 +12,58 @@
 
 ## [未發布]
 
+### 2026-04-22 19 - reusable-requirement-recorder-skill-first-design
+
+- Recorded At: `2026-04-22`
+- Change Summary: 建立可重複使用的原始需求記錄器治理與實作建議，採 skill-first、單一參數化流程，支援三種記錄模式（`chronological`、`versioned-basic`、`versioned-structured`），預設模式為 `chronological`，預設根路徑為 `/docs/histories`，並明確規範外部指定路徑/表格/版型時以外部需求優先。
+- Affected Artifacts: `.github/instructions/copilot.maintenance.instructions.md`, `.github/agents/copilot.maintainer.agent.md`, `.github/prompts/copilot.maintain.prompt.md`, `.github/skills/copilot.requirement-recorder.skill.md`, `.copilot/copilot/composed/instructions/copilot.maintenance.instructions.md`, `.copilot/copilot/composed/agents/copilot.maintainer.agent.md`, `.copilot/copilot/composed/prompts/copilot.maintain.prompt.md`, `.copilot/copilot/composed/skills/copilot.requirement-recorder.skill.md`, `.copilot/copilot/README.md`, `CHANGELOG.md`, `copilot.requirement-history.md`
+
+```md
+Follow instructions in #prompt:copilot.maintain.prompt.md with these arguments: 目的：建立可重複使用(給多個 agent / prompt 使用)的原始需求記錄器
+
+背景：
+- 有多個 agent / prompt 都有保留原始需求的需求
+- 訊息記錄器並非獨立使用，而是被其他 instructions / agents / prompts / skills 呼叫使用
+- 使用者不確定應該是要作為 instructions / agents / prompts / skills 哪一種
+- 主要使用情境為 github copilot 使用，usage 計算方式為 by request
+- 保留需求的方式有三種 1. 無版號記錄 2. 有版號無格式記錄 3. 有版號有格式記錄
+
+需求：
+- 請建議應該為 instructions / agents / prompts / skills 甚至是 script 或 mcp，簡稱為 AI 操作
+- 需考慮 usage 計算，盡量節省點數，使用上避免使用 handsoff 轉遞給 agent
+- 保留需求方式有三種，可設計為多個 AI 操作，或單個 AI 操作 + 參數
+- 保留需求方式的名稱只是作為說明用，並非指定名稱，如果 AI 操作內需要提及時，請建議最佳名稱
+- 保留需求方式預設為「無版號記錄」
+- 保留需求的根目錄路徑由外部傳入參數指定，未指定則預設為 /docs/histories
+- 保留需求方式為「無版號記錄」時：
+ - 反序保留原始需求
+ - 文件上方應以表格記錄更新歷程，欄位為：時間、需求摘要，排序同樣為反序
+ - 保留路徑為 [根目錄路徑]/[yyyy]/[MM]/History_yyyy-MM-dd.md
+ - 若外部傳入需求有提及保存路徑或歷程表格，依外部要求
+- 保留需求方式為「有版號無格式記錄」時：
+ - 反序保留原始需求
+ - 文件上方應以表格記錄更新歷程，欄位為：版本號、日期、摘要，排序同樣為反序
+ - 未指定版本號時，版本號應記為 Draft.<序號>，如 Draft.1, Draft.233
+ - 使用者要求發行為某個版本號時，將所有 Draft.<序號> 發行為 <版本號>.<序號>，例如指定版號為 1.10.13 則將 Draft.233 發行為 1.10.13.233，.233 非版號僅為對話的序號
+ - 歷程表的版本號欄位未發行時記錄為 Draft.<序號>，發行後改為 <版本號>.<序號>
+ - 保留路徑由使用者指定，若未指定預設為 <根目錄路徑>/v<第一碼>/v<第一碼>.<第二碼>/.../History-<第一碼>.<第二碼>.<...>.<末三碼>.<末兩碼>.md；
+	 例如版號為 v1.3.2.13 的需求記錄預設保存於 <根目錄路徑>/v1/v1.3/History-1.3.2.md
+ - 若外部傳入需求有提及保存路徑或歷程表格，依外部要求
+- 保留需求方式為「有版號有格式記錄」時：
+ - 反序保留原始需求
+ - 文件上方應以表格記錄更新歷程，欄位為：版本號、日期、Trigger(請翻譯為適切的中文)、摘要，排序同樣為反序
+ - 未指定版本號時，版本號應記為 Draft.<序號>，如 Draft.1, Draft.233
+ - 使用者要求發行為某個版本號時，將所有 Draft.<序號> 發行為 <版本號>.<序號>，例如指定版號為 1.10.13 則將 Draft.233 發行為 1.10.13.233
+ - 歷程表的版本號欄位未發行時記錄為 Draft.<序號>，發行後改為 <版本號>.<序號>
+ - 保留路徑由使用者指定，若未指定預設為 <根目錄路徑>/v<第一碼>/v<第一碼>.<第二碼>/.../History-<第一碼>.<第二碼>.<...>.<末三碼>.<末兩碼>.md；
+	 例如版號為 v1.3.2.13 的需求記錄預設保存於 <根目錄路徑>/v1/v1.3/History-1.3.2.md
+ - 記錄時應包含 Trigger、背景、需求、原始輸入(原始輸入即為要記錄的使用者原始輸入) 
+ - 若外部傳入需求有提及保存路徑、歷程表格、記錄版型，依外部要求
+- 以上設計若有更好的建議或不明確之處，請詢問我或與我討論後再繼續
+```
+
+---
+
 ### 2026-04-15 18 - copilot-instructions-safe-install-and-merge-prompt
 
 - Recorded At: `2026-04-15`

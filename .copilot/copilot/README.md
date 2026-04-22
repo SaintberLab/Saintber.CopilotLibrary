@@ -29,6 +29,11 @@
   - 說明：將 `.github/instructions/copilot-instructions.md` 去重後合併到 `.github/copilot-instructions.md`；若目標不存在，直接以來源內容建立目標檔。
   - 對應 Agent：`copilot.maintainer`
 
+## Skills
+- `copilot.requirement-recorder`
+  - 說明：提供可重複使用的原始需求記錄能力，供多個 agent/prompt 共用；預設模式為 `chronological`，預設根路徑為 `/docs/histories`，並支援 `versioned-basic`、`versioned-structured`。
+  - 使用建議：優先使用單一參數化流程（mode + path + release），避免為同一任務拆分多段 handoff 以降低 by-request usage。
+
 ## CLI 安裝與維護命令
 - `npx @saintber/copilot-library list`
   - 用途：列出所有可安裝的模組（含模組說明）；說明文字直接取自各模組 README 的第一段描述，確保與文件同步。若目標專案已有 `.copilot-library/state.json`，也會顯示已安裝的模組。

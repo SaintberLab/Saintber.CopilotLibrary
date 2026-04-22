@@ -7,6 +7,10 @@
 ## [未發布]
 
 ### 變更
+- 新增 `.github/skills/copilot.requirement-recorder.skill.md` 與 `.copilot/copilot/composed/skills/copilot.requirement-recorder.skill.md`：建立可被多個 agent/prompt 共用的原始需求記錄器（skill-first），支援 `chronological`、`versioned-basic`、`versioned-structured` 三模式，並預設 `chronological` + `/docs/histories`。
+- `copilot.maintenance.instructions.md`：加入可重用需求記錄器的穩定規範，明確模式行為、路徑預設、發布 Draft 遷移規則，以及「外部指定優先」覆寫原則。
+- `copilot.maintainer.agent.md`、`copilot.maintain.prompt.md`：加入記錄器參數契約與流程要求，強化 skill-first 與低 usage（避免不必要 handoff）策略。
+- `.copilot/copilot/sources/requirements/copilot.requirement-history.md`：新增本次需求原文與影響範圍記錄。
 - `src/cli.js`：調整 `copilot-instructions.md` 安裝策略為安全雙軌：若目標專案 `.github/copilot-instructions.md` 不存在，直接安裝到 `.github/` root；若已存在，改安裝到 `.github/instructions/copilot-instructions.md`，避免覆蓋既有根檔並保留後續合併空間。
 - `src/cli.js`：`copyFiles` 改為回傳實際落地路徑，`init/update` 以實際路徑寫入 state，確保 `doctor/remove` 對 staged 與 root 兩種路徑都能正確追蹤。
 - `src/cli.test.js`：新增 2 個測試，驗證 `copilot-instructions.md` 在「目標根檔不存在」與「目標根檔已存在」兩種情境下的安裝與 state 追蹤行為。

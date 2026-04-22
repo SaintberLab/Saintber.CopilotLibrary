@@ -15,6 +15,9 @@ status: active
 - `composed_path`（可選）: 繁中輸出路徑；預設 `.copilot/<module>/composed/`（可回退 `.copilot/composed/`）
 - `version`（可選）: CHANGELOG 目標版號；`no-increment` 代表就地更新最新版本；未提供則寫入 `[未發布]`
 - `release`（可選）: 使用者明確宣告發布新版時設為 `true`
+- `recorder_mode`（可選）: 需求記錄器模式（`chronological` | `versioned-basic` | `versioned-structured`），預設 `chronological`
+- `history_root_path`（可選）: 記錄器根目錄，預設 `/docs/histories`
+- `trigger_label`（可選）: `versioned-structured` 模式的 Trigger 中文欄位名稱
 
 # 任務
 使用 `copilot.maintainer` 子 agent，依新需求更新本函式庫自身 Copilot 客製化產物，或執行明確宣告的 release 維護流程。
@@ -28,6 +31,7 @@ status: active
 1.6. 不論 touched files 是否被 `applyTo` 命中，都必須對所有受影響產物強制套用 `copilot.maintainer.agent.md` 內嵌治理。
 1.7. 編輯前先解析 canonical 路徑。`copilot-instructions.md` 只能寫入 `.copilot/copilot/base/instructions/copilot-instructions.md` 與 `.copilot/copilot/composed/instructions/copilot-instructions.md`；若偵測到 `.copilot/copilot-instructions/**`，除非使用者明確要求遷移，否則標記為 non-canonical 並略過雙寫。
 2. 先轉為 English 再做 merge analysis。
+2.5. 若需求是建立可重複使用的原始需求記錄能力，需優先建議並落地 skill-first 的單一參數化流程；除非使用者明確要求，避免拆成多段 handoff 流程。
 3. 合併至 instruction、agent、prompt、skill。
 4. 避免重複。
 5. 儘量保留原結構。
@@ -44,6 +48,7 @@ status: active
 14.6. 發布且指定版號時同步更新 `package.json`。
 14.7. 發布時依 namespace 將 `.github/` 發布內容同步到 `/templates/<module>/`，必要的 repository-level 維護檔保留在 `/templates/` 根目錄。
 15. 發布時提供完整 git 指令；若無版控環境，僅提供指令引導。
+16. 若命中需求記錄器預設規則，需在外部需求未覆寫時，套用模式預設值與預設根路徑。
 
 # 責任邊界
 - 穩定治理規則放 instruction。

@@ -33,6 +33,31 @@ These rules apply only to the Copilot maintenance toolchain itself - `copilot.ma
 - Requirement history entries must be recorded in reverse chronological order within the same version section so iterative changes remain easy to trace.
 - If no version is provided, record the requirement under the `[未發布]` section of the namespace history file.
 - Requirement history entries should use a formal template with at least: `Recorded At`, `Change Summary`, `Affected Artifacts`, and `Original Requirement`.
+- For reusable raw requirement recording shared by multiple agents/prompts, prefer a dedicated skill as the primary AI operation. Keep one operation with mode parameters instead of many fragmented handoff flows.
+- For usage efficiency in GitHub Copilot (by request), default to direct in-context execution and avoid unnecessary handoff to subagents.
+- The reusable requirement recorder should support three modes with a single parameterized contract:
+	- `chronological` (default): no version number tracking.
+	- `versioned-basic`: versioned logging with index table but no fixed body template.
+	- `versioned-structured`: versioned logging with index table and structured sections.
+- Unless overridden by explicit user input, the requirement recorder root path defaults to `/docs/histories`.
+- If the user explicitly specifies a storage path, index schema, or record template, those external requirements take precedence over defaults.
+- `chronological` mode defaults:
+	- Preserve original requirements in reverse chronological order.
+	- Add/update a top table sorted reverse chronologically with columns: `Time`, `Requirement Summary`.
+	- Default path format: `<root>/<yyyy>/<MM>/History_<yyyy-MM-dd>.md`.
+- `versioned-basic` mode defaults:
+	- Preserve original requirements in reverse chronological order.
+	- Add/update a top table sorted reverse chronologically with columns: `Version`, `Date`, `Summary`.
+	- If version is not specified, use `Draft.<sequence>`.
+	- On explicit release to `<version>`, migrate all `Draft.<sequence>` entries to `<version>.<sequence>`.
+	- If no explicit path is provided, default to nested version path and file: `<root>/v<major>/v<major>.<minor>/.../History-<major>.<minor>.<patch>.md`.
+- `versioned-structured` mode defaults:
+	- Preserve original requirements in reverse chronological order.
+	- Add/update a top table sorted reverse chronologically with columns: `Version`, `Date`, `Trigger`, `Summary`.
+	- If version is not specified, use `Draft.<sequence>`.
+	- On explicit release to `<version>`, migrate all `Draft.<sequence>` entries to `<version>.<sequence>`.
+	- Record body should include: `Trigger` (Chinese label), `Background`, `Requirements`, `Original Input`.
+	- If no explicit path is provided, use the same default as `versioned-basic` mode.
 - If the user explicitly declares a release, move current `[未發布]` entries into the target version section (or a newly created version section), and keep an empty `[未發布]` section for the next cycle.
 - When release is declared, migrate the requirement history entries from `[未發布]` into the matching formal version section in each affected namespace history file, and keep a fresh empty `[未發布]` section for subsequent changes.
 - If release is declared with a target version, update the repository `package.json` `version` field to the same release number in the same release operation.

@@ -18,6 +18,9 @@ Provide the following:
 - `composed_path` (optional): Traditional Chinese output path (defaults to `.copilot/<module>/composed/`; fallback `.copilot/composed/`)
 - `version` (optional): target version number for `CHANGELOG.md`; use `no-increment` to update latest version in place; omit to list under `[未發布]`
 - `release` (optional): set to `true` when the user explicitly declares release publication
+- `recorder_mode` (optional): requirement recorder mode (`chronological` | `versioned-basic` | `versioned-structured`), default `chronological`
+- `history_root_path` (optional): recorder root path; default `/docs/histories`
+- `trigger_label` (optional): Chinese label used for `Trigger` field in `versioned-structured` mode
 
 # Task
 Use the `copilot.maintainer` subagent to update the library's own Copilot customization artifacts or execute explicit release maintenance using the new requirement.
@@ -31,6 +34,7 @@ When invoking the `copilot.maintainer` subagent, require it to:
 1.6. Regardless of whether the touched files are matched by `copilot.maintenance.instructions.md` `applyTo`, enforce the full maintenance governance embedded in `copilot.maintainer.agent.md` across all affected artifacts.
 1.7. Resolve canonical artifact paths before editing. For `copilot-instructions.md`, use only `.copilot/copilot/base/instructions/copilot-instructions.md` and `.copilot/copilot/composed/instructions/copilot-instructions.md`; if `.copilot/copilot-instructions/**` exists, report it as non-canonical and skip dual-write unless explicit migration is requested.
 2. Translate the requirement into English for merge analysis.
+2.5. For reusable raw requirement recorder design, recommend and implement a skill-first operation with one parameterized flow; avoid splitting into many handoff-heavy operations unless explicitly requested.
 3. Merge the new requirement into the existing instruction, agent, prompt, and skill artifacts.
 4. Avoid duplication.
 5. Preserve original structure as much as possible.
@@ -47,6 +51,7 @@ When invoking the `copilot.maintainer` subagent, require it to:
 14.6. If release is declared with a target version, update `package.json` so `version` matches that release number.
 14.7. If release is declared, sync all published artifacts from `.github/` into `/templates/<module>/` by namespace; keep repository-level Copilot governance files in `/templates/` root as needed.
 15. For release publication, provide complete git release commands (commit + tag + push); if git context is unavailable, provide command guidance without forcing execution.
+16. When requirement recorder defaults apply, enforce mode defaults and path defaults unless the external requirement explicitly overrides them.
 
 # Responsibility Rules
 - Put stable governance rules into the instruction.
