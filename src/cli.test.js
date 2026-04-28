@@ -11,6 +11,10 @@ import { join } from "path";
 import { tmpdir } from "os";
 import { run } from "./cli.js";
 
+// Test utilities per ai-toolchain-workflow.md
+// Verifies CLI behavior for module installation, updating, removal, and state tracking
+// across the deploy layer (.github/) from release layer (templates/[module]/)
+
 async function captureRun(args) {
   const logs = [];
   const errors = [];
@@ -41,18 +45,21 @@ async function captureRun(args) {
   }
 }
 
-test("list shows available modules with descriptions", async () => {
+test("list shows available modules with descriptions per ai-toolchain-workflow.md §3.2", async () => {
   const result = await captureRun(["list"]);
 
   assert.equal(result.exitCode, 0);
   assert.match(result.stdout, /Available modules:/);
+  // Verify all MODULE_DIRS are listed (code, copilot, docs, kb, migration, speckit)
   assert.match(result.stdout, /copilot/);
   assert.match(result.stdout, /migration/);
+  // Descriptions should be right-aligned (using — separator)
   assert.match(result.stdout, /—/);
+  // Sub-namespaces should not appear in module list
   assert.doesNotMatch(result.stdout, /migration\.dotnet-modernizer/);
 });
 
-test("init installs copilot-instructions to .github root when target root file is absent", async () => {
+test("init installs files from release layer (templates/[module]/) to deploy layer (.github/) per ai-toolchain-workflow.md §5.2, §10", async () => {
   const targetDir = mkdtempSync(join(tmpdir(), "copilot-library-"));
 
   const initResult = await captureRun([
@@ -64,19 +71,23 @@ test("init installs copilot-instructions to .github root when target root file i
   ]);
 
   assert.equal(initResult.exitCode, 0);
+  // Verify deployment to .github/ (deploy layer, flat structure)
   assert.equal(existsSync(join(targetDir, ".github", "copilot-instructions.md")), true);
   assert.equal(
     existsSync(join(targetDir, ".github", "instructions", "copilot-instructions.md")),
     false
   );
 
+  // Verify state tracking per ai-toolchain-workflow.md §10 (Installer State Minimum Schema)
   const state = JSON.parse(
     readFileSync(join(targetDir, ".copilot-library", "state.json"), "utf8")
   );
   assert.ok(state.installedFiles.includes("copilot-instructions.md"));
+  assert.ok(state.version);
+  assert.ok(state.targetPath);
 });
 
-test("init stages copilot-instructions under .github/instructions when root file already exists", async () => {
+test("init stages copilot-instructions under .github/instructions when root file already exists (dual-track strategy per ai-toolchain-workflow.md §5.2)", async () => {
   const targetDir = mkdtempSync(join(tmpdir(), "copilot-library-"));
   mkdirSync(join(targetDir, ".github"), { recursive: true });
   writeFileSync(
@@ -93,10 +104,12 @@ test("init stages copilot-instructions under .github/instructions when root file
   ]);
 
   assert.equal(initResult.exitCode, 0);
+  // Verify root file is preserved
   assert.equal(
     readFileSync(join(targetDir, ".github", "copilot-instructions.md"), "utf8"),
     "# existing\nkeep\n"
   );
+  // Verify staged copy for merge
   assert.equal(
     existsSync(join(targetDir, ".github", "instructions", "copilot-instructions.md")),
     true
@@ -108,7 +121,7 @@ test("init stages copilot-instructions under .github/instructions when root file
   assert.ok(state.installedFiles.includes("instructions/copilot-instructions.md"));
 });
 
-test("remove deletes only tracked installed module files and preserves user content", async () => {
+test("remove deletes only tracked installed files from deploy layer and preserves user content per ai-toolchain-workflow.md §10", async () => {
   const targetDir = mkdtempSync(join(tmpdir(), "copilot-library-"));
   mkdirSync(join(targetDir, ".github"), { recursive: true });
   writeFileSync(join(targetDir, ".github", "user-note.md"), "keep me\n");
@@ -156,7 +169,7 @@ test("remove deletes only tracked installed module files and preserves user cont
   );
 });
 
-test("remove with --module all fully uninstalls tracked content but keeps user .github files", async () => {
+test("remove with --module all fully uninstalls tracked content but keeps user .github files per ai-toolchain-workflow.md §10", async () => {
   const targetDir = mkdtempSync(join(tmpdir(), "copilot-library-"));
   mkdirSync(join(targetDir, ".github"), { recursive: true });
   writeFileSync(join(targetDir, ".github", "user-note.md"), "keep me\n");

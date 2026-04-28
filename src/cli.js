@@ -13,11 +13,22 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const ROOT = resolve(__dirname, "..");
+
+// Directory structure per ai-toolchain-workflow.md:
+// - templates/[module]/.github/[type]/: release layer (npm package artifacts, module-first)
+// - .github/[type]/: deploy layer (Copilot runtime, flat merge across all modules)
 const TEMPLATES_DIR = join(ROOT, "templates");
 const STATE_REL = ".copilot-library/state.json";
 const GITHUB_SUBDIR = ".github";
+
+// Artifact types per ai-toolchain-workflow.md §3.1
 const ARTIFACT_DIRS = ["agents", "instructions", "prompts", "skills"];
+
+// Modules per ai-toolchain-workflow.md §3.2
 const MODULE_DIRS = ["code", "copilot", "docs", "kb", "migration", "speckit"];
+// Special handling for copilot-instructions.md per ai-toolchain-workflow.md §5.2
+// Deploy strategy: if .github/copilot-instructions.md does not exist, install to root;
+// if it exists, stage to .github/instructions/ to preserve existing root file and enable merge.
 const COPILOT_INSTRUCTIONS_FILENAME = "copilot-instructions.md";
 const COPILOT_INSTRUCTIONS_STAGED_PATH = `instructions/${COPILOT_INSTRUCTIONS_FILENAME}`;
 
@@ -53,8 +64,10 @@ function writeState(targetDir, patch = {}) {
   mkdirSync(stateDir, { recursive: true });
   const now = new Date().toISOString();
   const prev = readState(targetDir) ?? {};
+  // State schema per ai-toolchain-workflow.md §10 (Installer State Minimum Schema)
   const state = {
     version: getPackageVersion(),
+    targetPath: resolve(targetDir),
     installedAt: prev.installedAt ?? now,
     updatedAt: now,
     ...patch,
@@ -76,10 +89,10 @@ function matchesModules(selector, modules) {
 function resolveTemplateEntry(relativePath) {
   const normalized = relativePath.replace(/\\/g, "/");
   const parts = normalized.split("/");
-
-  // Stage copilot-instructions under .github/instructions by default.
-  // During copy, it may be promoted to .github root when target root file does not exist.
   const filename = parts[parts.length - 1];
+
+  // Handle copilot-instructions.md: stage to .github/instructions by default,
+  // but promote to .github root if root file does not exist (per ai-toolchain-workflow.md §5.2).
   if (filename === COPILOT_INSTRUCTIONS_FILENAME) {
     return {
       sourceRelativePath: normalized,
@@ -88,6 +101,8 @@ function resolveTemplateEntry(relativePath) {
     };
   }
 
+  // Module-first structure: templates/[module]/[type]/ per ai-toolchain-workflow.md §3.3
+  // Maps to: .github/[type]/ (flat deployment layer)
   if (
     parts.length === 3 &&
     MODULE_DIRS.includes(parts[0]) &&
@@ -100,6 +115,8 @@ function resolveTemplateEntry(relativePath) {
     };
   }
 
+  // Legacy flat structure support (backward compatibility): [type]/
+  // This path is deprecated; all new modules should use templates/[module]/[type]/ structure.
   if (parts.length === 2 && ARTIFACT_DIRS.includes(parts[0])) {
     return {
       sourceRelativePath: normalized,
@@ -129,7 +146,9 @@ function collectTemplateEntries(dir, baseDir, modules) {
     results.push(resolved);
   }
 
-  // Deduplicate by destination path. Later entries win so module-scoped templates can override legacy root templates.
+  // Deduplicate by destination path. Later entries win so module-scoped templates
+  // (templates/[module]/[type]/) can override legacy root templates ([type]/),
+  // enabling smooth migration per ai-toolchain-workflow.md §4.
   const dedup = new Map();
   for (const item of results) {
     dedup.set(item.destinationRelativePath, item);
@@ -139,6 +158,10 @@ function collectTemplateEntries(dir, baseDir, modules) {
 }
 
 function resolveDestinationPath(entry, destBase) {
+  // Special handling for copilot-instructions.md deployment per ai-toolchain-workflow.md §5.2
+  // If root .github/copilot-instructions.md exists: stage to .github/instructions/
+  // (preserve existing root file for user review and merge)
+  // If root .github/copilot-instructions.md does not exist: install to root
   if (entry.destinationRelativePath !== COPILOT_INSTRUCTIONS_STAGED_PATH) {
     return entry.destinationRelativePath;
   }

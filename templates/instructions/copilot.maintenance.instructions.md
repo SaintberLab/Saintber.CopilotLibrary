@@ -1,6 +1,6 @@
 ---
 description: 維護 Copilot 客製化產物（含 instruction、agent、prompt 及 skill）的穩定規則。
-applyTo: ".github/instructions/**/*.md,.github/agents/**/*.md,.github/prompts/**/*.md,.copilot/**/*.md"
+applyTo: ".github/instructions/**/*.md,.github/agents/**/*.md,.github/prompts/**/*.md,ai/**/*.md"
 ---
 
 # Purpose
@@ -10,7 +10,7 @@ Define stable repository-wide rules for maintaining Copilot instructions, agents
 These rules apply to Copilot customization artifacts — including instruction, agent, prompt, and skill — and their source, composed, and published forms.
 
 # Stable Rules
-- Treat `.copilot/` as the authoring layer and `.github/` as the publish layer.
+- Treat `ai/` as the authoring layer and `.github/` as the publish layer.
 - Keep instruction, agent, prompt, and skill responsibilities separated.
 - Preserve existing rules unless the new requirement explicitly changes them.
 - Minimize unrelated edits during updates.
@@ -18,11 +18,11 @@ These rules apply to Copilot customization artifacts — including instruction, 
 - Maintain section structure when merging, unless restructuring is explicitly required.
 - Keep terminology consistent across instruction, agent, prompt, and skill artifacts.
 - Use English as the normalization language during merge and analysis when bilingual processing is required.
-- Store finalized Traditional Chinese outputs under `.copilot/composed/` using corresponding relative paths.
+- Store finalized Traditional Chinese outputs under `ai/composed/zh-TW/<module>/` using corresponding relative paths.
 - Ensure every update produces clearly sectioned output.
 - Write `description` fields in Traditional Chinese; keep technical terms and keywords in English.
 - After every maintenance update, record the change in `CHANGELOG.md`. If the user specifies a version number, use it; if the user requests no version increment, update the existing latest version entry instead; if not specified, list the change under `[未發布]`.
-- Preserve the original user requirement text when processing updates; store it in a namespace-scoped history file under the user-specified path or the default location (`.copilot/sources/updates/<namespace>/`).
+- Preserve the original user requirement text when processing updates; store it in a namespace-scoped history file under the user-specified path or the default location (`ai/<module>/sources/requirements/`).
 - Requirement history should not be split into date-based files. Use one namespace-based history file (default: `<namespace>.requirement-history.md`) and append the new entry under the matching version section.
 - Requirement history entries must be recorded in reverse chronological order within the same version section so iterative changes remain easy to trace.
 - If no version is provided, record the requirement under the `[未發布]` section of the namespace history file.
@@ -35,8 +35,8 @@ These rules apply to Copilot customization artifacts — including instruction, 
 - The `.github/TOOLS.md` file is part of release publication scope and must be included in the `.github/` to `/templates/` sync.
 - After every maintenance update, sync-update `.github/TOOLS.md` to reflect any additions, removals, or behavior changes in tools.
 - Domain-specific customization logic should be implemented in dedicated agents/prompts instead of being embedded into repository-wide maintenance instructions.
-- If the update target is not under `/.github/`, follow the authoring flow defined in `.copilot/README.md` (sources → base → composed → publish).
-- Every `.github/` file update MUST be accompanied by a corresponding update to the matching `.copilot/composed/` file with the complete Traditional Chinese translation in the same operation. Composed file updates are mandatory and must not be skipped or deferred.
+- If the update target is not under `/.github/`, follow the authoring flow defined in `ai/README.md` (sources → composed/en → composed/zh-TW → deploy).
+- Every `.github/` file update MUST be accompanied by a corresponding update to the matching `ai/composed/zh-TW/<module>/` file with the complete Traditional Chinese translation in the same operation. Composed file updates are mandatory and must not be skipped or deferred.
 
 # Naming Convention Rules
 - All instruction, agent, prompt, and skill artifacts use a namespace-based naming scheme.

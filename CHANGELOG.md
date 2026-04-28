@@ -7,6 +7,22 @@
 ## [未發布]
 
 ### 變更
+- **CLI 代碼文件調整以符合 ai-toolchain-workflow 架構設計**：
+  - `src/cli.js`：增強架構註釋，明確說明 authoring 層 (`ai/`)、deploy 層 (`.github/`) 與 release 層 (`templates/`) 的角色與流向；改進 `resolveTemplateEntry`、`collectTemplateEntries`、`resolveDestinationPath` 等核心函數的可讀性和文檔；確保完全支持新的模組優先 (`templates/[module]/[type]/`) 目錄結構與平坦部署層 (`.github/[type]/`) 映射；添加 `targetPath` 到狀態跟蹤（符合 ai-toolchain-workflow.md §10 Installer State Minimum Schema）。
+  - `src/cli.test.js`：增強測試註釋與文檔，直接引用 ai-toolchain-workflow.md 各相關章節；確保所有測試驗證新架構的模組化安裝、平坦部署、state 追蹤與 copilot-instructions.md 雙軌部署邏輯；驗證用戶內容保護與追蹤移除行為完整性。
+- **`.copilot` 內容遷移到 `ai/` 新架構**：執行非破壞性遷移，完成 `base -> ai/<module>/<type>/`、`composed -> ai/composed/zh-TW/<module>/<type>/`、`sources/requirements -> ai/<module>/sources/requirements/` 的批次搬移；共搬移 124 個檔案，5 個既有目標檔採 skip 保留（未覆蓋）；遷移明細輸出於 `migration-log-copilot-to-ai.txt`。
+- **copilot maintain 三件套參數清理**：移除未被流程使用的參數 `existing_instruction`、`existing_agent`、`existing_prompt`、`existing_skill`（同步更新 `.github` 與 `ai/composed` 對應 prompt/agent），並將輸入參數 `new_requirement_zh_tw` 更名為 `new_requirement`，避免非必要語系後綴。
+- **新 authoring 層 `ai/` 建立**：依 `docs/policy/ai-toolchain-workflow.md` 新設計，建立 `ai/` 目錄骨架（module-first, type-second）；包含六個模組（`copilot`、`migration`、`kb`、`docs`、`code`、`speckit`）、七種 artifact 類型目錄、`sources/requirements/`、以及雙語 composed 層（`ai/composed/en/`、`ai/composed/zh-TW/`）。
+- **`ai/README.md`**：建立 authoring 層導覽說明，記錄模組清單、目錄結構與 authoring 流程。
+- **`ai/manifest.yaml`**：建立 module → composed → publish path 對應表，供 CLI 與 deploy 工具解析。
+- **`copilot.maintenance.instructions.md`**：authoring 層路徑從 `.copilot/` 全面改為 `ai/`；composed 層拆分為 `ai/composed/en/<module>/`（English deploy-ready）與 `ai/composed/zh-TW/<module>/`（繁中備份）；更新 `applyTo` 範圍為 `ai/**/*.md`；更新 `copilot-instructions.md` canonical 路徑；更新 module README 路徑為 `ai/<module>/README.md`；更新 Every `.github/` 同步規則。
+- **`copilot.maintainer.agent.md`**：內嵌治理路徑全面改為 `ai/`；Inputs 新增 English deploy-ready 輸出路徑參數；步驟 8 同時寫入 `ai/composed/en/` 與 `ai/composed/zh-TW/`；Release 步驟從 `ai/composed/en/` 同步至 `templates/`。
+- **`copilot.maintain.prompt.md`**：`requirement_storage_path` 預設改為 `ai/<module>/sources/requirements/`；`composed_path` 預設改為 `ai/composed/zh-TW/<module>/`。
+- **`ai/copilot/README.md`**：建立 copilot module 的新 README（取代 `.copilot/copilot/README.md` 作為往後的正式路徑），更新 authoring 路徑說明與需求歷程路徑。
+- **`ai/copilot/sources/requirements/copilot.requirement-history.md`**：建立需求歷程記錄檔，保存本次建構需求原文。
+- **`ai/composed/en/copilot/`**：建立 English deploy-ready composed 輸出（instruction、agent、prompt）。
+- **`ai/composed/zh-TW/copilot/`**：建立繁體中文備份 composed 輸出（instruction、agent、prompt）。
+
 - 新增 `.github/skills/copilot.requirement-recorder.skill.md` 與 `.copilot/copilot/composed/skills/copilot.requirement-recorder.skill.md`：建立可被多個 agent/prompt 共用的原始需求記錄器（skill-first），支援 `chronological`、`versioned-basic`、`versioned-structured` 三模式，並預設 `chronological` + `/docs/histories`。
 - `copilot.maintenance.instructions.md`：加入可重用需求記錄器的穩定規範，明確模式行為、路徑預設、發布 Draft 遷移規則，以及「外部指定優先」覆寫原則。
 - `copilot.maintainer.agent.md`、`copilot.maintain.prompt.md`：加入記錄器參數契約與流程要求，強化 skill-first 與低 usage（避免不必要 handoff）策略。

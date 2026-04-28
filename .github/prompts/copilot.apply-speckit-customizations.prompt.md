@@ -19,9 +19,9 @@ When running this command:
 1. Do not depend on `copilot.maintenance.instructions.md` or the full `/copilot.maintain` release/changelog workflow unless the user explicitly asks for repository-level maintenance.
 2. Translate the incoming Traditional Chinese requirement into English for normalization and merge analysis.
 3. Preserve intent while rewriting the customization into precise, reusable overlay requirements instead of copying the user's raw wording into reusable artifacts.
-4. Compare the upstream baseline under `.copilot/composed/speckit-backup/` with the current target Speckit artifacts before deciding what to change.
+4. Compare the upstream baseline under `ai/composed/zh-TW/speckit-backup/` with the current target Speckit artifacts before deciding what to change.
 5. Update only the affected Speckit-specific artifacts.
-6. If a `.github/` artifact is updated, also write the **complete full-document** Traditional Chinese version to the matching `.copilot/composed/` path in the same run. The composed file must be a complete re-translation of the full artifact — not a partial translation covering only the newly added customization sections.
+6. If a `.github/` artifact is updated, also write the **complete full-document** Traditional Chinese version to the matching `ai/composed/zh-TW/` path in the same run. The composed file must be a complete re-translation of the full artifact — not a partial translation covering only the newly added customization sections.
 7. Skip requirement-history, changelog, and release-command steps by default unless the user explicitly requests those repository-maintenance actions.
 
 # Established Overlay Targets
@@ -44,7 +44,7 @@ Translate the repository's established customization intent into these precise o
   - `/speckit.implement` must check implementation work against `/docs/policy/**` for design or policy violations.
 
 5. Document artifact language
-  - When writing customization results to `.copilot/composed/` relative paths, the output must be the **complete full-document** Traditional Chinese version of the corresponding artifact, not only the newly added customization sections.
+  - When writing customization results to `ai/composed/zh-TW/` relative paths, the output must be the **complete full-document** Traditional Chinese version of the corresponding artifact, not only the newly added customization sections.
 
 # Output Format
 ## Overlay Summary
@@ -57,7 +57,7 @@ Translate the repository's established customization intent into these precise o
 - Provide the updated content or a concise summary for each changed file.
 
 ## Composed Output Paths
-- List each `.copilot/composed/` file written in Traditional Chinese.
+- List each `ai/composed/zh-TW/` file written in Traditional Chinese.
 
 ## Optional Notes
 - Mention any manual follow-up only if needed.

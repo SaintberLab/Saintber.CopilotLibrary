@@ -1,0 +1,91 @@
+# AI Toolchain Manifest
+# Maps modules to their composed and publish paths.
+# Used by CLI and deploy tooling to resolve artifact locations.
+
+version: "1.0.0"
+
+modules:
+  copilot:
+    description: "Copilot artifact maintenance governance"
+    source: "ai/copilot"
+    composed:
+      en: "ai/composed/en/copilot"
+      zh-TW: "ai/composed/zh-TW/copilot"
+    deploy:
+      github: ".github"
+    release: "templates/copilot"
+
+  migration:
+    description: ".NET migration toolchain"
+    source: "ai/migration"
+    composed:
+      en: "ai/composed/en/migration"
+      zh-TW: "ai/composed/zh-TW/migration"
+    deploy:
+      github: ".github"
+    release: "templates/migration"
+
+  kb:
+    description: "Knowledge base functionality"
+    source: "ai/kb"
+    composed:
+      en: "ai/composed/en/kb"
+      zh-TW: "ai/composed/zh-TW/kb"
+    deploy:
+      github: ".github"
+    release: "templates/kb"
+
+  docs:
+    description: "Architecture documentation rules and agents"
+    source: "ai/docs"
+    composed:
+      en: "ai/composed/en/docs"
+      zh-TW: "ai/composed/zh-TW/docs"
+    deploy:
+      github: ".github"
+    release: "templates/docs"
+
+  code:
+    description: "Product code conventions (tech stack, migration rules)"
+    source: "ai/code"
+    composed:
+      en: "ai/composed/en/code"
+      zh-TW: "ai/composed/zh-TW/code"
+    deploy:
+      github: ".github"
+    release: "templates/code"
+
+  speckit:
+    description: "SDD / Speckit process governance"
+    source: "ai/speckit"
+    composed:
+      en: "ai/composed/en/speckit"
+      zh-TW: "ai/composed/zh-TW/speckit"
+    deploy:
+      github: ".github"
+    release: "templates/speckit"
+
+artifact_types:
+  - instructions
+  - agents
+  - prompts
+  - skills
+  - mcp
+  - sdk
+
+deploy_targets:
+  github_copilot:
+    platform: "GitHub Copilot"
+    path: ".github"
+    layout: flat
+    status: active
+  mcp:
+    platform: "MCP"
+    path: ".mcp"
+    layout: flat
+    status: planned
+  sdk:
+    platform: "Copilot SDK"
+    path: "sdk"
+    layout: flat
+    status: planned

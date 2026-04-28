@@ -13,7 +13,7 @@ Use the `copilot.maintainer` subagent to perform a temporary smoke test of the m
 
 # Expected Validation
 - The `.github/` artifact is normalized.
-- The matching `.copilot/composed/` artifact is written in full Traditional Chinese.
+- The matching `ai/composed/zh-TW/` artifact is written in full Traditional Chinese.
 - `CHANGELOG.md`, requirement history, and `TOOLS.md` are updated when the test introduces a meaningful temporary artifact change.
 
 # Note

@@ -8,13 +8,13 @@ status: active
 # Input
 Provide the following:
 - `new_requirement_zh_tw`: the new requirement in Traditional Chinese
-- `requirement_storage_path` (optional): path to store original requirement history; defaults to `.copilot/sources/updates/<namespace>/`
+- `requirement_storage_path` (optional): path to store original requirement history; defaults to `ai/<module>/sources/requirements/`
 - `requirement_file_format` (optional): filename format for requirement history; defaults to `<namespace>.requirement-history.md` (e.g., `copilot.requirement-history.md`)
 - `existing_instruction`: the current instruction content (optional)
 - `existing_agent`: the current agent content (optional)
 - `existing_prompt`: the current prompt content (optional)
 - `existing_skill`: the current skill content (optional)
-- `composed_path` (optional): Traditional Chinese output path (defaults to `.copilot/composed/`)
+- `composed_path` (optional): Traditional Chinese output path (defaults to `ai/composed/zh-TW/<module>/`)
 - `version` (optional): target version number for CHANGELOG.md entry; use `no-increment` to update the latest version entry in-place; omit to list under `[未發布]`
 - `release` (optional): set to `true` when the user explicitly declares release publication
 
@@ -33,7 +33,7 @@ When invoking the `copilot.maintainer` subagent, require it to:
 7. Normalize wording and section structure.
 8. Verify cross-artifact consistency.
 9. Update the target files directly when write access is available.
-10. Produce full Traditional Chinese outputs for the composed layer including skill when applicable, and write them to the corresponding `.copilot/composed/` files. This is a mandatory step and must not be skipped.
+10. Produce full Traditional Chinese outputs for the composed layer including skill when applicable, and write them to the corresponding `ai/composed/zh-TW/<module>/` files. This is a mandatory step and must not be skipped.
 11. Return the final result in clearly sectioned output.
 12. Update `CHANGELOG.md` with a change record using the version behavior: if `version` input is provided, use it as the version tag; if `version` is `no-increment`, update the current latest version entry in-place; otherwise list under `[未發布]`.
 13. Sync-update `.github/TOOLS.md` to reflect any additions, removals, or behavior changes in tools resulting from this update.

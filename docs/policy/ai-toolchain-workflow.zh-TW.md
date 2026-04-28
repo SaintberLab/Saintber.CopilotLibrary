@@ -193,7 +193,7 @@ ai/
 
 **作業步驟**：
 1. 將 `ai/composed/en/[模組]/` 產物同步至平台執行目標（見 §10）。佈署目標保持平坦，不保留模組子目錄：
-   - Copilot 類產物（instructions/、agents/、prompts/、skills/）→ `.github/[類型]/`（所有模組的檔案平坦合併）
+   - Copilot 類產物（instructions/、agents/、prompts/、skills/）→ `.github/`（所有模組的檔案平坦合併）
    - MCP 產物 → `.mcp/`
    - SDK 產物 → `sdk/`
 2. 尚未定義 adapter 的平台，維持 composed 狀態不佈署。
