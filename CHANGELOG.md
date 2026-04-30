@@ -7,6 +7,20 @@
 ## [未發布]
 
 ### 變更
+- 尚無項目
+
+---
+
+## [0.3.0] - 2026-04-30
+
+### 變更
+- **通用後端遷移重構工具鏈（保留 DI/IOC 專用流程）**：
+  - `.github/prompts/migration.adopt-backend-modernization.prompt.md`：新增通用後端遷移重構命令，支援 `migration_objective`、`scan_scope`、`modify_scope`、可選 `depth_mode`、CSV 盤點輸出、雙向抽樣複檢、分批導入與最終驗證。
+  - `.github/skills/migration.backend-modernization.skill.md`：新增可重用 skill 契約，統一通用盤點欄位（`File`、`Line`、`ReferencedObject`、`ProcessingStatus`、`Code`）、複檢規則與分批導入要求。
+  - `.github/instructions/code.migration-conventions.instructions.md`：新增「Mandatory Backend Modernization Quality Loop」，將盤點 -> 複檢 -> 分批導入 -> 驗證規範擴展到 DI/IOC 以外的後端重構遷移類型，並保留深度參數為可選。
+  - `.github/agents/migration.dotnet-modernizer.agent.md`：新增可重用通用後端遷移重構流程段落，明確 `migration_objective` 與可選 `depth_mode` 契約，維持 script-first、AI bounded partition 的品質策略。
+  - 既有 `/migration.adopt-di-ioc` 與 `migration.di-ioc-adoption` 保持獨立可用，確保 DI/IOC 任務仍能精準執行。
+  - 同步更新 `ai/migration/README.md`、`ai/migration/sources/requirements/migration.requirement-history.md`，並完成 `ai/composed/en/` 與 `ai/composed/zh-TW/` 對應檔案同步。
 - **Template 與 Scripts 整合至 AI 演化流程**：
   - `src/cli.js`：擴展 `ARTIFACT_DIRS` 新增 `scripts` 與 `docs` 類型，支援 `templates/[module]/scripts/` 與 `templates/[module]/docs/` 目錄結構，同時維持向後相容性（舊版 `[type]/` 根目錄路徑仍被支援）；更新 `resolveTemplateEntry` 與 `getModuleSelectorFromFile` 函數以支援新類型檔案（如 `*.template.ps1`、`*.template.md`）；新增完整註釋說明 artifact 類型與 extended types 的區分。
   - `/templates/migration/scripts/`：新增 DI/IOC 盤點指令稿 `di-ioc-inventory-script.template.ps1`（移從 `ai/migration/templates/`），支援 `direct-hit` 與 `recursive-search` 掃描深度、CSV 輸出與標準狀態欄位。

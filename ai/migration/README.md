@@ -27,6 +27,8 @@
   - 審查或更新架構遷移範本，再建立指定範圍的架構遷移計畫。
 - `/migration.prepare-backend-plan`
   - 審查或更新後端遷移範本，再建立指定範圍的後端遷移計畫。
+- `/migration.adopt-backend-modernization`
+  - 以通用流程執行後端重構遷移：盤點 -> 雙向抽樣複檢 -> 分批導入 -> 最終驗證。
 - `/migration.adopt-di-ioc`
   - 先盤點 DI/IOC 目標並輸出 CSV，再做抽樣複檢、分批導入與最終驗證。
 - `/migration.prepare-frontend-plan`
@@ -44,8 +46,10 @@
 
 ## Skills
 
+- `migration.backend-modernization`
+  - 定義後端遷移重構的通用參數化流程契約（migration_objective、scope、可選 depth、CSV 欄位、雙向抽樣複檢、待釐清輸出）。
 - `migration.di-ioc-adoption`
-  - 定義 DI/IOC 導入的單一參數化流程契約（scope/depth、CSV 欄位、雙向抽樣複檢、待釐清輸出）。
+  - 定義 DI/IOC 導入的單一參數化流程契約（scope/depth、CSV 欄位、雙向抽樣複檢、待釐清輸出），用於精準 DI/IOC 專用任務。
 
 ## DI/IOC Adoption Resources
 

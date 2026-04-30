@@ -43,6 +43,30 @@ applyTo: "MAS_Batch/**,MAS_Web/**,Mas_Library/**,MAS_Bst/**,MAS_Gov/**,MAS_DataB
 
 除非使用者明確要求一次性回答，否則不得跳過計畫直接實作。
 
+# 後端通用遷移重構品質迴圈（必要）
+對於 Legacy 後端遷移重構任務（包含但不限於 DI/IOC 導入、設定現代化、框架相容替換），遷移回覆必須遵循以下流程：
+1. 先盤點遷移目標，且明確指定 `scan_scope` 與 `modify_scope`。
+2. 盤點後進行雙向複檢：
+	- 由盤點表抽樣（確認誤判）
+	- 由原始碼抽樣（確認漏判）
+3. 只依據已複檢結果分批導入重構。
+4. 每批導入與整體導入後都要做最終驗證（至少 build 驗證；可行時加入執行期 smoke checks）。
+5. 對無法安全判定的項目標記 `Pending Clarification`，並產出問題釐清文件。
+
+深度行為（選填）：
+- 若未提供 `depth_mode`，預設採範圍內直接盤點與修改。
+- `direct-hit`: 僅包含指定範圍內尚未完成本次遷移目標的項目。
+- `recursive-search`: 遞迴追蹤參考物件並檢查遷移狀態，直到沒有新參考為止。
+
+通用盤點輸出要求：
+- 盤點結果必須包含 `.csv` 成果。
+- CSV 必填欄位：`File`、`Line`、`ReferencedObject`、`ProcessingStatus`、`Code`。
+- `ProcessingStatus` 至少要可區分：`Candidate`、`FalsePositive`、`MissingCandidate`、`Pending Clarification`、`Completed`。
+
+執行品質要求：
+- 預設以 script-assisted 盤點為主。
+- 若 script 精準率/召回率不足，先反覆完善 script，再以 AI 對「有限範圍分區」進行輔助分析，避免 context 過載。
+
 # DI/IOC 導入品質迴圈（必要）
 對於尚未導入 DI/IOC 的 Legacy 專案，遷移回覆必須遵循以下流程：
 1. 先盤點 DI/IOC 目標，且必須有明確 `scope` 與 `depth` 參數。

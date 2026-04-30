@@ -47,6 +47,25 @@ tools: [edit/editFiles, search/codebase, search/fileSearch, search/usages]
 
 建立範圍專屬計畫後，必須同時產出「更新後範本」與「範圍專屬計畫」的繁中備份。
 
+## 後端通用遷移重構流程（可重用）
+當目標範圍需要漸進式 Legacy 後端重構時，必須執行以下可重用流程：
+1. 先做盤點，且明確指定參數：
+	- `scan_scope`：要掃描的檔案/資料夾/模組
+	- `modify_scope`：允許修改的檔案/資料夾/模組
+	- `migration_objective`：本次遷移目標（例如 DI/IOC 導入、設定現代化、相容替換）
+	- `depth_mode`（選填）：`direct-hit` 或 `recursive-search`
+2. 產出並維護盤點表與 `.csv`，欄位至少包含：`File`、`Line`、`ReferencedObject`、`ProcessingStatus`、`Code`。
+3. 對盤點結果進行雙向抽樣複檢：
+	- 由盤點表抽樣，檢查誤判
+	- 由原始碼抽樣，檢查漏判
+4. 僅在受限 `modify_scope` 內，依已複檢狀態分批導入重構。
+5. 最後執行導入結果驗證，並回報覆蓋率與殘餘風險。
+
+若未提供 `depth_mode`，預設採範圍內直接盤點。
+若項目無法安全判定，標記為 `Pending Clarification` 並產出問題釐清文件。
+
+預設採 script-assisted 掃描。若精準度不足，先迭代修正 script，再以「分區、限範圍」方式使用 AI 輔助盤點，避免 context 過大。
+
 ## DI/IOC 導入流程（Legacy 專案）
 當目標範圍仍大量使用 manual `new`、static construction 或 service locator 時，必須執行以下順序：
 1. 先做 DI/IOC 盤點，且明確指定參數：

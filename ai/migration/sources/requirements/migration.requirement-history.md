@@ -2,12 +2,54 @@
 
 | Version | Date | Summary |
 |---------|------|---------|
-| 未發布 | 2026-04-30 | 整合 templates 與 scripts 安裝至 AI 演化流程：擴展 CLI 支援 `scripts` 與 `docs` 文件類型，遷移 DI/IOC 工具相關資源至 `/templates/migration/` |
-| 未發布 | 2026-04-30 | 新增舊專案 DI/IOC 逐步導入工具鏈：盤點、雙向複檢、分批導入、最終驗證與待釐清輸出 |
+| 0.3.0 | 2026-04-30 | 擴大 DI/IOC 流程為通用後端遷移重構工具：新增可重用 prompt/skill、保留 DI/IOC 專用 prompt，並強化盤點/複檢/分批導入/驗證迴圈規範 |
+| 0.3.0 | 2026-04-30 | 整合 templates 與 scripts 安裝至 AI 演化流程：擴展 CLI 支援 `scripts` 與 `docs` 文件類型，遷移 DI/IOC 工具相關資源至 `/templates/migration/` |
+| 0.3.0 | 2026-04-30 | 新增舊專案 DI/IOC 逐步導入工具鏈：盤點、雙向複檢、分批導入、最終驗證與待釐清輸出 |
 
 ---
 
 ## [未發布]
+
+（本區段保留供下一輪需求記錄）
+
+---
+
+## [0.3.0] - 2026-04-30
+
+### 2026-04-30（第三筆）
+
+**Recorded At**: 2026-04-30  
+**Change Summary**: 將既有 DI/IOC 導入流程擴大為可重用的後端通用遷移重構工具鏈；新增 `/migration.adopt-backend-modernization` prompt 與 `migration.backend-modernization` skill，支援盤點、雙向抽樣複檢、分批導入與最終驗證；補強 `code.migration-conventions.instructions.md` 與 `migration.dotnet-modernizer.agent.md` 的通用品質迴圈規範，並保留 `/migration.adopt-di-ioc` 作為 DI/IOC 精準專用命令。  
+**Affected Artifacts**: code.migration-conventions.instructions.md, migration.dotnet-modernizer.agent.md, migration.adopt-backend-modernization.prompt.md, migration.backend-modernization.skill.md, ai/migration/prompts/migration.adopt-backend-modernization.prompt.md, ai/migration/skills/migration.backend-modernization.skill.md, ai/composed/en/**, ai/composed/zh-TW/**, ai/migration/README.md, CHANGELOG.md  
+**Original Requirement**:
+```
+目的：製作一套遷移 C# 後端程式碼的 AI 工具
+背景：
+- 原本已有 DI/IOC 遷移工具，發現流程符合大多數遷移需求
+- 太多重構需求需一套流程來逐步導入
+- 可參考原本 DI/IOC 遷移工具，或改寫/擴大原本 DI/IOC 遷移工具的適用範圍
+需求：
+- 需先進行遷移目標的盤點
+- 盤點後需再複檢是否正確清點出所有遷移目標以及是否誤判目標
+- 盤點/檢視後依據盤點結果逐步導入
+- 最後應再檢視導入結果是否正確
+- 應保留參數決定修改範圍
+- 不一定有深度參數，若符合深度參數，則 => 深度為直接命中目標，只盤點/修改範圍內沒有遷移目標；深度為遞迴搜尋，則尋找每個物件的參考物件是否導，直到沒有參考物件為止
+- 盤點結果應包含 .csv 檔案
+- 盤點結果欄位至少應包含檔案、行數、參考物件、處理狀態、程式碼
+- 應考量適合做成 skill 與 agent 的部分，以利未來可以 reuse
+- 可依你的評估，考慮新增一套通用遷移工具，或擴大 DI/IOC 工具為通用遷移工具
+- 針對 DI/IOC 仍應保有自己的 prompt 以精確執行 DI/IOC 任務
+
+預計項目(可再建議更好作法，與我討論後再進行)：
+- 預計盤點會使用 Script 進行盤點，若檢核結果有缺失再反覆完善 Script 進行盤點
+- 若有 Script 無法精確命中，需要 AI 支援的部分則修正 AI 以正確盤點
+- 若須 AI 支援則應規劃掃瞄範圍逐範圍掃描，以免 context 過大造成品質下降
+- 檢視盤點結果應包含「盤點結果表」的抽樣檢核(確認已盤出的結果是否誤判)、「原始程式碼」的抽樣檢核(確認是否有遺漏未列入盤點表的項目)
+- 檢視修改結果我只想到 build 檢核
+```
+
+---
 
 ### 2026-04-30（第二筆）
 

@@ -43,6 +43,30 @@ For architecture migration, backend migration, frontend migration, and MVC featu
 
 Do not start implementation directly without a plan unless the user explicitly requests a one-off answer only.
 
+# Mandatory Backend Modernization Quality Loop
+For legacy backend modernization tasks (including but not limited to DI/IOC adoption, configuration modernization, and framework compatibility replacements), migration responses must follow this loop:
+1. Inventory migration targets first with explicit `scan_scope` and `modify_scope`.
+2. Re-check inventory quality with both:
+   - sampled validation from the inventory table (false-positive check)
+   - sampled validation from original source files (missing-target check)
+3. Introduce changes incrementally by verified inventory status.
+4. Perform final validation after each batch and after full rollout (at minimum build validation; include runtime smoke checks when available).
+5. Mark ambiguous items as `Pending Clarification` and generate a clarification issue document for developers.
+
+Depth behavior (optional):
+- If `depth_mode` is not provided, run direct scope-only inventory and refactoring.
+- `direct-hit`: only include targets inside the selected scope that have not completed the selected modernization objective.
+- `recursive-search`: continue tracing referenced objects and verify modernization status recursively until no new reference remains.
+
+Common inventory output requirements:
+- The inventory result must include a `.csv` artifact.
+- Required CSV columns: `File`, `Line`, `ReferencedObject`, `ProcessingStatus`, `Code`.
+- `ProcessingStatus` should explicitly differentiate at least: `Candidate`, `FalsePositive`, `MissingCandidate`, `Pending Clarification`, `Completed`.
+
+Execution quality requirements:
+- Prefer script-assisted inventory as the baseline.
+- If script precision/recall is insufficient, iteratively improve scripts and apply AI-assisted analysis only to bounded scan partitions to avoid context overflow.
+
 # Mandatory DI/IOC Adoption Quality Loop
 For legacy projects that have not adopted DI/IOC yet, migration responses must follow this loop:
 1. Inventory DI/IOC targets first, using explicit `scope` and `depth` parameters.
