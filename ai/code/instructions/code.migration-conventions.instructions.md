@@ -43,6 +43,29 @@ For architecture migration, backend migration, frontend migration, and MVC featu
 
 Do not start implementation directly without a plan unless the user explicitly requests a one-off answer only.
 
+# Mandatory DI/IOC Adoption Quality Loop
+For legacy projects that have not adopted DI/IOC yet, migration responses must follow this loop:
+1. Inventory DI/IOC targets first, using explicit `scope` and `depth` parameters.
+2. Re-check inventory quality with both:
+	- sampled validation from the inventory table (false-positive check)
+	- sampled validation from original source files (missing-target check)
+3. Introduce DI/IOC incrementally based on the verified inventory only.
+4. Perform final validation after refactoring (at minimum build validation; include runtime smoke checks when available).
+5. Mark ambiguous static `new` instantiations as `Pending Clarification` and generate a clarification issue document for developers.
+
+Depth parameter requirements:
+- `direct-hit`: only include targets inside the selected scope that have not adopted DI/IOC.
+- `recursive-search`: continue tracing referenced objects and verify DI/IOC status recursively until no new reference remains.
+
+Inventory output requirements:
+- The inventory result must include a `.csv` artifact.
+- Required CSV columns: `File`, `Line`, `ReferencedObject`, `ProcessingStatus`, `Code`.
+- `ProcessingStatus` should explicitly differentiate at least: `Candidate`, `FalsePositive`, `MissingCandidate`, `Pending Clarification`, `Completed`.
+
+Execution quality requirements:
+- Prefer script-assisted inventory as the baseline.
+- If script precision/recall is insufficient, iteratively improve scripts and apply AI-assisted analysis only to bounded scan partitions to avoid context overflow.
+
 # Required Templates
 - `/Tasks/architecture-migration-template.md`
 - `/Tasks/backend-migration-template.md`

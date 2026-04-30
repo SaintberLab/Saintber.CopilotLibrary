@@ -66,13 +66,13 @@ After creating the scope-specific backend plan, always produce a Traditional Chi
 ## DI/IOC Adoption Workflow (Legacy Projects)
 When the target scope still uses manual `new`, static construction, or service locator patterns, execute the following sequence:
 1. Run DI/IOC inventory first with explicit parameters:
-  - `scan_scope`: files/folders/modules to scan
-  - `modify_scope`: files/folders/modules allowed to change
-  - `depth_mode`: `direct-hit` or `recursive-search`
+   - `scan_scope`: files/folders/modules to scan
+   - `modify_scope`: files/folders/modules allowed to change
+   - `depth_mode`: `direct-hit` or `recursive-search`
 2. Produce and maintain an inventory table plus `.csv` output with at least: `File`, `Line`, `ReferencedObject`, `ProcessingStatus`, `Code`.
 3. Re-check inventory quality with two-sided sampling:
-  - table-driven sampling to detect false positives
-  - source-driven sampling to detect missing targets
+   - table-driven sampling to detect false positives
+   - source-driven sampling to detect missing targets
 4. Apply DI/IOC refactoring incrementally by verified inventory status.
 5. Run final validation and report both migration coverage and residual risks.
 

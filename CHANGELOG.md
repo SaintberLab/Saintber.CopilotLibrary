@@ -7,6 +7,7 @@
 ## [未發布]
 
 ### 變更
+- **migration DI/IOC 導入工具鏈新增**：新增 `migration.di-ioc-adoption` skill 與 `/migration.adopt-di-ioc` prompt，建立 legacy 專案 DI/IOC 導入標準流程（盤點 -> 雙向抽樣複檢 -> 逐步導入 -> 最終驗證），支援 `scan_scope`、`modify_scope`、`depth_mode`（`direct-hit`/`recursive-search`）、分區掃描策略、CSV 輸出（`File`、`Line`、`ReferencedObject`、`ProcessingStatus`、`Code`），並新增 static class `new` 目標之 `Pending Clarification` 與問題釐清文件輸出要求；同步補強 `migration.dotnet-modernizer` agent 與 `code.migration-conventions.instructions.md` 的穩定規範。
 - **CLI 代碼文件調整以符合 ai-toolchain-workflow 架構設計**：
   - `src/cli.js`：增強架構註釋，明確說明 authoring 層 (`ai/`)、deploy 層 (`.github/`) 與 release 層 (`templates/`) 的角色與流向；改進 `resolveTemplateEntry`、`collectTemplateEntries`、`resolveDestinationPath` 等核心函數的可讀性和文檔；確保完全支持新的模組優先 (`templates/[module]/[type]/`) 目錄結構與平坦部署層 (`.github/[type]/`) 映射；添加 `targetPath` 到狀態跟蹤（符合 ai-toolchain-workflow.md §10 Installer State Minimum Schema）。
   - `src/cli.test.js`：增強測試註釋與文檔，直接引用 ai-toolchain-workflow.md 各相關章節；確保所有測試驗證新架構的模組化安裝、平坦部署、state 追蹤與 copilot-instructions.md 雙軌部署邏輯；驗證用戶內容保護與追蹤移除行為完整性。

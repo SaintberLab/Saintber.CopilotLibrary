@@ -47,8 +47,8 @@ Do not start implementation directly without a plan unless the user explicitly r
 For legacy projects that have not adopted DI/IOC yet, migration responses must follow this loop:
 1. Inventory DI/IOC targets first, using explicit `scope` and `depth` parameters.
 2. Re-check inventory quality with both:
-	- sampled validation from the inventory table (false-positive check)
-	- sampled validation from original source files (missing-target check)
+   - sampled validation from the inventory table (false-positive check)
+   - sampled validation from original source files (missing-target check)
 3. Introduce DI/IOC incrementally based on the verified inventory only.
 4. Perform final validation after refactoring (at minimum build validation; include runtime smoke checks when available).
 5. Mark ambiguous static `new` instantiations as `Pending Clarification` and generate a clarification issue document for developers.

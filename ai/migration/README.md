@@ -1,6 +1,6 @@
 # migration Module Guide
 
-`migration` 用於 .NET Framework -> .NET 8 功能遷移、規劃與審查。
+`migration` 用於 .NET Framework -> .NET 8 功能遷移、規劃與審查，並提供可重用的 DI/IOC 盤點、複檢、逐步導入流程。
 
 ## Agents
 
@@ -27,6 +27,8 @@
   - 審查或更新架構遷移範本，再建立指定範圍的架構遷移計畫。
 - `/migration.prepare-backend-plan`
   - 審查或更新後端遷移範本，再建立指定範圍的後端遷移計畫。
+- `/migration.adopt-di-ioc`
+  - 先盤點 DI/IOC 目標並輸出 CSV，再做抽樣複檢、分批導入與最終驗證。
 - `/migration.prepare-frontend-plan`
   - 審查或更新前端遷移範本，再建立指定範圍的前端遷移計畫。
 - `/migration.migrate-controller-and-view`
@@ -39,6 +41,11 @@
   - 為已遷移功能新增平台整合與可觀測性設計。
 - `/migration.review-output`
   - 嚴格審查遷移計畫或程式碼變更的正確性與風險。
+
+## Skills
+
+- `migration.di-ioc-adoption`
+  - 定義 DI/IOC 導入的單一參數化流程契約（scope/depth、CSV 欄位、雙向抽樣複檢、待釐清輸出）。
 
 ## 使用案例
 ### 範例 1：分析一個舊 MVC 模組並產出遷移計畫
