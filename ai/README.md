@@ -2,23 +2,18 @@
 
 This directory is the source-of-truth authoring layer for all AI tool artifacts in `@saintber/copilot-library`.
 
+Draft updates must stay inside `ai/` and must not modify `.github/` unless Deploy is explicitly declared.
+
 ## Structure
 
 ```
 ai/
-├── [module]/                       ← raw artifact authoring (module-first, type-second)
-│   ├── instructions/
-│   ├── agents/
-│   ├── prompts/
-│   ├── skills/
-│   ├── mcp/
-│   ├── sdk/
+├── [module]/
+│   ├── en/[type]/                  ← Draft (English)
+│   ├── zh-TW/[type]/               ← Draft (Traditional Chinese)
 │   └── sources/
 │       └── requirements/           ← module-scoped requirement history
-├── composed/
-│   ├── en/[module]/[type]/         ← deploy-ready English artifacts
-│   └── zh-TW/[module]/[type]/      ← Traditional Chinese backup artifacts
-├── manifest.yaml                   ← module → composed → publish path map
+├── manifest.yaml                   ← module → draft → deploy/release path map
 └── README.md                       ← this file
 ```
 
@@ -36,20 +31,19 @@ ai/
 ## Authoring Flow
 
 ```
-ai/[module]/[type]/        ← 1. Draft here
+ai/[module]/en/[type]/     ← 1. Draft in English
+ai/[module]/zh-TW/[type]/  ← 1. Draft in Traditional Chinese
     ↓
-ai/composed/en/[module]/   ← 2. Produce deploy-ready English artifact
-ai/composed/zh-TW/[module/ ← 2. Produce Chinese backup in same operation
+.github/[type]/            ← 2. Deploy only when explicitly declared
     ↓
-.github/[type]/            ← 3. Deploy (flat merge, no module subdirs)
-    ↓
-templates/[module]/        ← 4. Release (module-first npm package artifact)
+templates/[module]/        ← 3. Release only when explicitly declared
 ```
 
 ## Rules
 
-- Always produce English and Chinese backup artifacts in the same operation (point conservation).
+- Draft stage writes only to `ai/[module]/en/` and `ai/[module]/zh-TW/`.
+- Do not modify `.github/` during Draft unless the current prompt explicitly declares Deploy.
+- Do not modify `templates/` unless Release is explicitly declared.
 - Raw requirement history is stored under `ai/[module]/sources/requirements/`.
 - `.github/` is the live Copilot runtime target and must remain flat.
-- `templates/` is updated only during release publication.
 - See `docs/policy/ai-toolchain-workflow.md` for the full lifecycle specification.

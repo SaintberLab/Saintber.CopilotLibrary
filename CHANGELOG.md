@@ -7,7 +7,17 @@
 ## [未發布]
 
 ### 變更
-- 尚無項目
+- **AI 工具生產流程改版（Draft/Deploy/Release 階段化）**：
+  - `ai/README.md`：將流程改為 module 內雙語 Draft（`ai/<module>/en/[type]`、`ai/<module>/zh-TW/[type]`），移除 `composed` 作為流程主節點，並明確 Deploy/Release 階段邊界。
+  - `ai/manifest.yaml`：模組映射由 `composed` 調整為 `draft`，並改用 module 內 `en` / `zh-TW` 路徑。
+  - `ai/copilot/instructions/copilot.maintenance.instructions.md`：更新維護治理為 Draft-first；未宣告 Deploy 前不得更新 `.github/`。
+  - `ai/copilot/agents/copilot.maintainer.agent.md`：工作流程更新為先寫雙語 Draft，僅在 `deploy=true` 時寫入 `.github/`。
+  - `ai/copilot/prompts/copilot.maintain.prompt.md`：輸入參數改為 `draft_en_path`、`draft_zh_tw_path`、`deploy`，移除 composed 導向語意。
+  - `ai/copilot/README.md`：同步更新 copilot 模組使用與路徑說明，強化「未宣告 Deploy 不寫 `.github/`」規則。
+  - `ai/copilot/sources/requirements/copilot.requirement-history.md`：新增本次需求原文與影響範圍記錄。
+- **Deploy 發布（copilot maintain 三件套）**：已將 Draft 版維護規則正式同步到 `.github/instructions/copilot.maintenance.instructions.md`、`.github/agents/copilot.maintainer.agent.md`、`.github/prompts/copilot.maintain.prompt.md`。
+- **中文 Draft 補齊（新流程目錄）**：新增 `ai/copilot/zh-TW/instructions/copilot.maintenance.instructions.md`、`ai/copilot/zh-TW/agents/copilot.maintainer.agent.md`、`ai/copilot/zh-TW/prompts/copilot.maintain.prompt.md`，補齊新流程下的繁體中文 Draft 產物。
+- **英文 Draft 補齊（新流程目錄）**：新增 `ai/copilot/en/instructions/copilot.maintenance.instructions.md`、`ai/copilot/en/agents/copilot.maintainer.agent.md`、`ai/copilot/en/prompts/copilot.maintain.prompt.md`，補齊新流程下的英文 Draft 產物。
 
 ---
 

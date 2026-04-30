@@ -1,5 +1,5 @@
 # AI Toolchain Manifest
-# Maps modules to their composed and publish paths.
+# Maps modules to their draft, deploy, and release paths.
 # Used by CLI and deploy tooling to resolve artifact locations.
 
 version: "1.0.0"
@@ -8,9 +8,9 @@ modules:
   copilot:
     description: "Copilot artifact maintenance governance"
     source: "ai/copilot"
-    composed:
-      en: "ai/composed/en/copilot"
-      zh-TW: "ai/composed/zh-TW/copilot"
+    draft:
+      en: "ai/copilot/en"
+      zh-TW: "ai/copilot/zh-TW"
     deploy:
       github: ".github"
     release: "templates/copilot"
@@ -18,9 +18,9 @@ modules:
   migration:
     description: ".NET migration toolchain"
     source: "ai/migration"
-    composed:
-      en: "ai/composed/en/migration"
-      zh-TW: "ai/composed/zh-TW/migration"
+    draft:
+      en: "ai/migration/en"
+      zh-TW: "ai/migration/zh-TW"
     deploy:
       github: ".github"
     release: "templates/migration"
@@ -28,9 +28,9 @@ modules:
   kb:
     description: "Knowledge base functionality"
     source: "ai/kb"
-    composed:
-      en: "ai/composed/en/kb"
-      zh-TW: "ai/composed/zh-TW/kb"
+    draft:
+      en: "ai/kb/en"
+      zh-TW: "ai/kb/zh-TW"
     deploy:
       github: ".github"
     release: "templates/kb"
@@ -38,9 +38,9 @@ modules:
   docs:
     description: "Architecture documentation rules and agents"
     source: "ai/docs"
-    composed:
-      en: "ai/composed/en/docs"
-      zh-TW: "ai/composed/zh-TW/docs"
+    draft:
+      en: "ai/docs/en"
+      zh-TW: "ai/docs/zh-TW"
     deploy:
       github: ".github"
     release: "templates/docs"
@@ -48,9 +48,9 @@ modules:
   code:
     description: "Product code conventions (tech stack, migration rules)"
     source: "ai/code"
-    composed:
-      en: "ai/composed/en/code"
-      zh-TW: "ai/composed/zh-TW/code"
+    draft:
+      en: "ai/code/en"
+      zh-TW: "ai/code/zh-TW"
     deploy:
       github: ".github"
     release: "templates/code"
@@ -58,9 +58,9 @@ modules:
   speckit:
     description: "SDD / Speckit process governance"
     source: "ai/speckit"
-    composed:
-      en: "ai/composed/en/speckit"
-      zh-TW: "ai/composed/zh-TW/speckit"
+    draft:
+      en: "ai/speckit/en"
+      zh-TW: "ai/speckit/zh-TW"
     deploy:
       github: ".github"
     release: "templates/speckit"

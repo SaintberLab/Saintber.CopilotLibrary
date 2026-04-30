@@ -11,12 +11,11 @@ Provide the following:
 - `module` (optional): target module (`code`, `copilot`, `docs`, `kb`, `migration`, `speckit`); omit only for repository-level governance changes
 - `requirement_storage_path` (optional): path to store original requirement history; defaults to `ai/<module>/sources/requirements/` (fallback `ai/sources/requirements/`)
 - `requirement_file_format` (optional): filename format for requirement history; defaults to `<namespace>.requirement-history.md` (e.g., `copilot.requirement-history.md`)
-- `composed_path` (optional): Traditional Chinese output path (defaults to `ai/composed/zh-TW/<module>/`; fallback `ai/composed/zh-TW/`)
+- `draft_en_path` (optional): Draft English output path (defaults to `ai/<module>/en/`; fallback `ai/en/`)
+- `draft_zh_tw_path` (optional): Draft Traditional Chinese output path (defaults to `ai/<module>/zh-TW/`; fallback `ai/zh-TW/`)
+- `deploy` (optional): set to `true` only when the user explicitly declares Deploy
 - `version` (optional): target version number for `CHANGELOG.md`; use `no-increment` to update latest version in place; omit to list under `[未發布]`
 - `release` (optional): set to `true` when the user explicitly declares release publication
-- `recorder_mode` (optional): requirement recorder mode (`chronological` | `versioned-basic` | `versioned-structured`), default `chronological`
-- `history_root_path` (optional): recorder root path; default `/docs/histories`
-- `trigger_label` (optional): Chinese label used for `Trigger` field in `versioned-structured` mode
 
 # Task
 Use the `copilot.maintainer` subagent to update the library's own Copilot customization artifacts or execute explicit release maintenance using the new requirement.
@@ -28,17 +27,16 @@ When invoking the `copilot.maintainer` subagent, require it to:
 1. Read the Traditional Chinese requirement.
 1.5. Preserve original requirement text in the specified/default namespace history file (module-scoped by default), grouped by version section, recorded in reverse chronological order, and formatted using the standard history template for traceability.
 1.6. Regardless of whether the touched files are matched by `copilot.maintenance.instructions.md` `applyTo`, enforce the full maintenance governance embedded in `copilot.maintainer.agent.md` across all affected artifacts.
-1.7. Resolve canonical artifact paths before editing. For `copilot-instructions.md`, use only `ai/copilot/instructions/copilot-instructions.md` (raw), `ai/composed/en/copilot/instructions/copilot-instructions.md` (deploy-ready English), and `ai/composed/zh-TW/copilot/instructions/copilot-instructions.md` (Traditional Chinese backup); if non-canonical duplicates exist, report them as skipped unless explicit migration is requested.
+1.7. Resolve canonical artifact paths before editing. For `copilot-instructions.md`, use only `ai/copilot/en/instructions/copilot-instructions.md` and `ai/copilot/zh-TW/instructions/copilot-instructions.md`; if non-canonical duplicates exist, report them as skipped unless explicit migration is requested.
 2. Translate the requirement into English for merge analysis.
-2.5. For reusable raw requirement recorder design, recommend and implement a skill-first operation with one parameterized flow; avoid splitting into many handoff-heavy operations unless explicitly requested.
 3. Merge the new requirement into the existing instruction, agent, prompt, and skill artifacts.
 4. Avoid duplication.
 5. Preserve original structure as much as possible.
 6. Do not break old rules unless the new requirement explicitly changes them.
 7. Normalize wording and section structure.
 8. Verify cross-artifact consistency.
-9. Update the target files directly when write access is available.
-10. Produce full Traditional Chinese outputs for the composed layer including skill when applicable, and write them to the corresponding `ai/composed/zh-TW/<module>/` files (fallback `ai/composed/zh-TW/`). This is mandatory and must not be skipped. Also write deploy-ready English outputs to `ai/composed/en/<module>/` in the same operation.
+9. Update Draft files directly under `ai/<module>/en/` and `ai/<module>/zh-TW/` when write access is available.
+10. Update `.github/` only if `deploy=true` is explicitly declared in the current prompt.
 11. Return the final result in clearly sectioned output.
 12. Update `CHANGELOG.md` with a change record using version behavior.
 13. Sync-update module README files (`ai/<module>/README.md`, `/templates/<module>/README.md`) to reflect behavior/tooling changes.
@@ -47,7 +45,6 @@ When invoking the `copilot.maintainer` subagent, require it to:
 14.6. If release is declared with a target version, update `package.json` so `version` matches that release number.
 14.7. If release is declared, sync all published artifacts from `.github/` into `/templates/<module>/` by namespace; keep repository-level Copilot governance files in `/templates/` root as needed.
 15. For release publication, provide complete git release commands (commit + tag + push); if git context is unavailable, provide command guidance without forcing execution.
-16. When requirement recorder defaults apply, enforce mode defaults and path defaults unless the external requirement explicitly overrides them.
 
 # Responsibility Rules
 - Put stable governance rules into the instruction.
@@ -57,8 +54,9 @@ When invoking the `copilot.maintainer` subagent, require it to:
 
 # Required File Update Behavior
 - When target paths are provided and write access is available, update corresponding files directly.
+- Without explicit `deploy=true`, `.github/` must not be modified.
 - If `release=true` and a concrete `version` is provided, update `package.json` so `version` matches release.
-- Write full Traditional Chinese outputs to matching `composed_path` paths.
+- Write both English and Traditional Chinese Draft outputs to matching `draft_en_path` and `draft_zh_tw_path` paths.
 - Do not silently skip file updates. If a file cannot be updated, explicitly report which path failed and why.
 
 # Output Format
@@ -110,4 +108,5 @@ When invoking the `copilot.maintainer` subagent, require it to:
 - skill: <updated|skipped|failed|not-applicable> - <path>
 - changelog: <updated|skipped|failed> - CHANGELOG.md
 - module_readme: <updated|skipped|failed> - <path(s)>
+- deploy_publish: <updated|skipped|failed> - <.github path(s)>
 - package: <updated|skipped|failed> - package.json
