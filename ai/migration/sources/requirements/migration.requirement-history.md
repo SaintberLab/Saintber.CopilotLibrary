@@ -2,13 +2,39 @@
 
 | Version | Date | Summary |
 |---------|------|---------|
+| 未發布 | 2026-04-30 | 整合 templates 與 scripts 安裝至 AI 演化流程：擴展 CLI 支援 `scripts` 與 `docs` 文件類型，遷移 DI/IOC 工具相關資源至 `/templates/migration/` |
 | 未發布 | 2026-04-30 | 新增舊專案 DI/IOC 逐步導入工具鏈：盤點、雙向複檢、分批導入、最終驗證與待釐清輸出 |
 
 ---
 
 ## [未發布]
 
-### 2026-04-30
+### 2026-04-30（第二筆）
+
+**Recorded At**: 2026-04-30  
+**Change Summary**: 整合 templates 與 scripts 安裝至 AI 演化流程，擴展 CLI `src/cli.js` 新增 `scripts` 與 `docs` artifact 類型，支援 `templates/[module]/scripts/` 與 `templates/[module]/docs/` 目錄結構；遷移 DI/IOC 工具相關文件（盤點指令稿、導入指南、待釐清範本）至 `/templates/migration/` 新目錄結構，使 CLI 命令可直接管理腳本與文件資源；更新 `ai/migration/README.md` 指向新的發行路徑。  
+**Affected Artifacts**: src/cli.js, templates/migration/scripts/di-ioc-inventory-script.template.ps1, templates/migration/docs/DI-IOC-ADOPTION-GUIDE.md, templates/migration/docs/di-ioc-clarification-template.md, ai/migration/README.md, CHANGELOG.md  
+**Original Requirement**:
+```
+需求：整合 template 發行/安裝至 AI 演化流程內
+
+規劃與調整：
+- 決定 template/script 安裝目錄結構：建議 `/templates/migration/scripts/` 與 `/templates/migration/docs/` 
+- 更新 cli.js 以將 templates 納入安裝/更新/移除等流程：
+  - 增加 ARTIFACT_DIRS 以支援 `scripts` 與 `docs` 兩種類型
+  - 更新 collectTemplateEntries / resolveTemplateEntry 以支援新類型
+  - 更新 resolveDestinationPath 以正確映射到 templates/[module]/ 結構
+- 遷移檔案：
+  - `/templates/migration/scripts/` 下放 PowerShell / bash 指令稿（di-ioc-inventory-script.template.ps1 等）
+  - `/templates/migration/docs/` 下放 Markdown 文件（DI-IOC-ADOPTION-GUIDE.md, di-ioc-clarification-template.md）
+- 同步更新 migration 工具：
+  - README 指向 templates/ 路徑
+  - 指南中的相對路徑改為 templates 發行路徑
+```
+
+---
+
+### 2026-04-30（第一筆）
 
 **Recorded At**: 2026-04-30  
 **Change Summary**: 建立可重用的 DI/IOC 導入流程，新增 `migration.di-ioc-adoption` skill 與 `/migration.adopt-di-ioc` prompt，並補強 `migration.dotnet-modernizer` agent 與 `code.migration-conventions.instructions.md` 的穩定規範；流程包含 scope/depth 參數、CSV 盤點輸出、雙向抽樣複檢、分批導入與最終驗證，另對 static class 的模糊實例化案例以 `Pending Clarification` 輸出問題釐清文件。  

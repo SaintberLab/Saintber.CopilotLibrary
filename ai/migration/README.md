@@ -47,6 +47,15 @@
 - `migration.di-ioc-adoption`
   - 定義 DI/IOC 導入的單一參數化流程契約（scope/depth、CSV 欄位、雙向抽樣複檢、待釐清輸出）。
 
+## DI/IOC Adoption Resources
+
+### 工作指南
+- [templates/migration/docs/DI-IOC-ADOPTION-GUIDE.md](../../templates/migration/docs/DI-IOC-ADOPTION-GUIDE.md) - 完整工作流程指南，涵蓋參數確認、盤點執行、雙向複檢、分批導入、驗證與待釐清處理
+
+### 樣板與腳本
+- [templates/migration/scripts/di-ioc-inventory-script.template.ps1](../../templates/migration/scripts/di-ioc-inventory-script.template.ps1) - PowerShell 盤點指令稿樣板（direct-hit / recursive-search）
+- [templates/migration/docs/di-ioc-clarification-template.md](../../templates/migration/docs/di-ioc-clarification-template.md) - Pending Clarification 待釐清文件範本
+
 ## 使用案例
 ### 範例 1：分析一個舊 MVC 模組並產出遷移計畫
 ```text

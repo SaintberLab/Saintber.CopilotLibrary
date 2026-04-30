@@ -7,7 +7,15 @@
 ## [未發布]
 
 ### 變更
-- **migration DI/IOC 導入工具鏈新增**：新增 `migration.di-ioc-adoption` skill 與 `/migration.adopt-di-ioc` prompt，建立 legacy 專案 DI/IOC 導入標準流程（盤點 -> 雙向抽樣複檢 -> 逐步導入 -> 最終驗證），支援 `scan_scope`、`modify_scope`、`depth_mode`（`direct-hit`/`recursive-search`）、分區掃描策略、CSV 輸出（`File`、`Line`、`ReferencedObject`、`ProcessingStatus`、`Code`），並新增 static class `new` 目標之 `Pending Clarification` 與問題釐清文件輸出要求；同步補強 `migration.dotnet-modernizer` agent 與 `code.migration-conventions.instructions.md` 的穩定規範。
+- **Template 與 Scripts 整合至 AI 演化流程**：
+  - `src/cli.js`：擴展 `ARTIFACT_DIRS` 新增 `scripts` 與 `docs` 類型，支援 `templates/[module]/scripts/` 與 `templates/[module]/docs/` 目錄結構，同時維持向後相容性（舊版 `[type]/` 根目錄路徑仍被支援）；更新 `resolveTemplateEntry` 與 `getModuleSelectorFromFile` 函數以支援新類型檔案（如 `*.template.ps1`、`*.template.md`）；新增完整註釋說明 artifact 類型與 extended types 的區分。
+  - `/templates/migration/scripts/`：新增 DI/IOC 盤點指令稿 `di-ioc-inventory-script.template.ps1`（移從 `ai/migration/templates/`），支援 `direct-hit` 與 `recursive-search` 掃描深度、CSV 輸出與標準狀態欄位。
+  - `/templates/migration/docs/`：新增 DI/IOC 導入工作流程指南 `DI-IOC-ADOPTION-GUIDE.md`（移從 `ai/migration/DI-IOC-ADOPTION-GUIDE.md`）、Pending Clarification 範本 `di-ioc-clarification-template.md`（移從 `ai/migration/templates/`），指向新的 templates 路徑。
+  - `ai/migration/README.md`：更新資源連結，指向新的 `/templates/migration/scripts/` 與 `/templates/migration/docs/` 位置；移除已遷移的直接文件連結。
+- **Migration 模組目錄結構優化**：遷移 DI/IOC 工具相關文件至 templates 發行層，使得 CLI `init/update` 命令可直接管理腳本與文件資源；scripts 與 docs 納入模組化安裝流程，確保使用者安裝時能同時獲得完整的工作指南與範本。
+- **CLI 邊界測試**：驗證 `templates/[module]/scripts/` 與 `templates/[module]/docs/` 在 `init`、`update`、`remove`、`doctor` 命令中的完整覆蓋；確認模組選擇器 (`--module migration`) 能正確篩選新增的文件類型。
+- **原有 DI/IOC 導入工具鏈持續支援**：`migration.di-ioc-adoption` skill、`/migration.adopt-di-ioc` prompt、`migration.dotnet-modernizer` agent 等 AI 流程保持穩定，與新增的 template 腳本與文件相輔相成。
+- **migration DI/IOC 導入工具鏈**：`migration.di-ioc-adoption` skill 與 `/migration.adopt-di-ioc` prompt 建立 legacy 專案 DI/IOC 導入標準流程（盤點 -> 雙向抽樣複檢 -> 逐步導入 -> 最終驗證），支援 `scan_scope`、`modify_scope`、`depth_mode`（`direct-hit`/`recursive-search`）、分區掃描策略、CSV 輸出（`File`、`Line`、`ReferencedObject`、`ProcessingStatus`、`Code`），並新增 static class `new` 目標之 `Pending Clarification` 與問題釐清文件輸出要求；同步補強 `migration.dotnet-modernizer` agent 與 `code.migration-conventions.instructions.md` 的穩定規範。
 - **CLI 代碼文件調整以符合 ai-toolchain-workflow 架構設計**：
   - `src/cli.js`：增強架構註釋，明確說明 authoring 層 (`ai/`)、deploy 層 (`.github/`) 與 release 層 (`templates/`) 的角色與流向；改進 `resolveTemplateEntry`、`collectTemplateEntries`、`resolveDestinationPath` 等核心函數的可讀性和文檔；確保完全支持新的模組優先 (`templates/[module]/[type]/`) 目錄結構與平坦部署層 (`.github/[type]/`) 映射；添加 `targetPath` 到狀態跟蹤（符合 ai-toolchain-workflow.md §10 Installer State Minimum Schema）。
   - `src/cli.test.js`：增強測試註釋與文檔，直接引用 ai-toolchain-workflow.md 各相關章節；確保所有測試驗證新架構的模組化安裝、平坦部署、state 追蹤與 copilot-instructions.md 雙軌部署邏輯；驗證用戶內容保護與追蹤移除行為完整性。
@@ -23,15 +31,12 @@
 - **`ai/copilot/sources/requirements/copilot.requirement-history.md`**：建立需求歷程記錄檔，保存本次建構需求原文。
 - **`ai/composed/en/copilot/`**：建立 English deploy-ready composed 輸出（instruction、agent、prompt）。
 - **`ai/composed/zh-TW/copilot/`**：建立繁體中文備份 composed 輸出（instruction、agent、prompt）。
-
-- 新增 `.github/skills/copilot.requirement-recorder.skill.md` 與 `.copilot/copilot/composed/skills/copilot.requirement-recorder.skill.md`：建立可被多個 agent/prompt 共用的原始需求記錄器（skill-first），支援 `chronological`、`versioned-basic`、`versioned-structured` 三模式，並預設 `chronological` + `/docs/histories`。
-- `copilot.maintenance.instructions.md`：加入可重用需求記錄器的穩定規範，明確模式行為、路徑預設、發布 Draft 遷移規則，以及「外部指定優先」覆寫原則。
-- `copilot.maintainer.agent.md`、`copilot.maintain.prompt.md`：加入記錄器參數契約與流程要求，強化 skill-first 與低 usage（避免不必要 handoff）策略。
-- `.copilot/copilot/sources/requirements/copilot.requirement-history.md`：新增本次需求原文與影響範圍記錄。
-- `src/cli.js`：調整 `copilot-instructions.md` 安裝策略為安全雙軌：若目標專案 `.github/copilot-instructions.md` 不存在，直接安裝到 `.github/` root；若已存在，改安裝到 `.github/instructions/copilot-instructions.md`，避免覆蓋既有根檔並保留後續合併空間。
-- `src/cli.js`：`copyFiles` 改為回傳實際落地路徑，`init/update` 以實際路徑寫入 state，確保 `doctor/remove` 對 staged 與 root 兩種路徑都能正確追蹤。
-- `src/cli.test.js`：新增 2 個測試，驗證 `copilot-instructions.md` 在「目標根檔不存在」與「目標根檔已存在」兩種情境下的安裝與 state 追蹤行為。
-- 新增 `.github/prompts/copilot.merge-copilot-instructions.prompt.md`（及 `.copilot/copilot/base|composed` 對應檔）：提供去重/合併流程，將 `.github/instructions/copilot-instructions.md` 合併到 `.github/copilot-instructions.md`；若目標不存在則直接建立。
+- **可重用需求記錄器（skill-first）**：新增 `.github/skills/copilot.requirement-recorder.skill.md` 與 `.copilot/copilot/composed/skills/copilot.requirement-recorder.skill.md`，建立可被多個 agent/prompt 共用的原始需求記錄器，支援 `chronological`、`versioned-basic`、`versioned-structured` 三模式，預設 `chronological` + `/docs/histories`。
+  - `copilot.maintenance.instructions.md`：加入可重用需求記錄器的穩定規範，明確模式行為、路徑預設、發布 Draft 遷移規則，以及「外部指定優先」覆寫原則。
+  - `copilot.maintainer.agent.md`、`copilot.maintain.prompt.md`：加入記錄器參數契約與流程要求，強化 skill-first 與低 usage（避免不必要 handoff）策略。
+  - `.copilot/copilot/sources/requirements/copilot.requirement-history.md`：新增本次需求原文與影響範圍記錄。
+- **`copilot-instructions.md` 雙軌部署策略**：`src/cli.js` 調整安裝策略為安全雙軌：若目標專案 `.github/copilot-instructions.md` 不存在，直接安裝到 `.github/` root；若已存在，改安裝到 `.github/instructions/copilot-instructions.md`，避免覆蓋既有根檔並保留後續合併空間。`copyFiles` 改為回傳實際落地路徑，`init/update` 以實際路徑寫入 state，確保 `doctor/remove` 對 staged 與 root 兩種路徑都能正確追蹤。`src/cli.test.js` 新增 2 個測試，驗證 `copilot-instructions.md` 在「目標根檔不存在」與「目標根檔已存在」兩種情境下的安裝與 state 追蹤行為。
+- **`copilot.merge-copilot-instructions` Prompt**：新增 `.github/prompts/copilot.merge-copilot-instructions.prompt.md`（及 `.copilot/copilot/base|composed` 對應檔），提供去重/合併流程，將 `.github/instructions/copilot-instructions.md` 合併到 `.github/copilot-instructions.md`；若目標不存在則直接建立。
 - `README.md`、`.copilot/copilot/README.md`、`templates/copilot/README.md`：補充新安裝策略與新 prompt 說明。
 
 ---

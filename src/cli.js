@@ -22,7 +22,8 @@ const STATE_REL = ".copilot-library/state.json";
 const GITHUB_SUBDIR = ".github";
 
 // Artifact types per ai-toolchain-workflow.md §3.1
-const ARTIFACT_DIRS = ["agents", "instructions", "prompts", "skills"];
+// Extended types: scripts (PowerShell/bash), docs (Markdown/text resources)
+const ARTIFACT_DIRS = ["agents", "instructions", "prompts", "skills", "scripts", "docs"];
 
 // Modules per ai-toolchain-workflow.md §3.2
 const MODULE_DIRS = ["code", "copilot", "docs", "kb", "migration", "speckit"];
@@ -103,6 +104,8 @@ function resolveTemplateEntry(relativePath) {
 
   // Module-first structure: templates/[module]/[type]/ per ai-toolchain-workflow.md §3.3
   // Maps to: .github/[type]/ (flat deployment layer)
+  // Supports both standard artifact types (agents, instructions, prompts, skills)
+  // and extended types (scripts, docs) for non-artifact resources.
   if (
     parts.length === 3 &&
     MODULE_DIRS.includes(parts[0]) &&
@@ -200,7 +203,23 @@ function getModuleSelectorFromFile(filePath) {
     ".skill.md",
   ];
   const suffix = knownSuffixes.find((item) => filename.endsWith(item));
-  return suffix ? filename.slice(0, -suffix.length) : filename.replace(/\.md$/, "");
+  
+  if (suffix) {
+    return filename.slice(0, -suffix.length);
+  }
+  
+  // For non-artifact types (scripts, docs), extract module selector from filename.
+  // Examples: di-ioc-inventory-script.template.ps1 -> di-ioc-inventory
+  //           DI-IOC-ADOPTION-GUIDE.md -> DI-IOC-ADOPTION
+  // Try to extract a meaningful prefix, defaulting to full filename without extension.
+  const nameWithoutExt = filename.replace(/\.[^.]+$/, "");
+  
+  // For templated resources (*.template.*), use prefix before .template
+  if (filename.includes(".template.")) {
+    return nameWithoutExt.split(".template")[0];
+  }
+  
+  return nameWithoutExt;
 }
 
 function collectModuleSelectors(files) {
