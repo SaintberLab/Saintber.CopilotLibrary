@@ -1,16 +1,22 @@
 ---
 description: 維護 Copilot 客製化產物（含 instruction、agent、prompt 及 skill）的穩定規則。
-applyTo: ".github/instructions/**/*.md,.github/agents/**/*.md,.github/prompts/**/*.md,.copilot/**/*.md"
+applyTo: ".github/instructions/copilot.maintenance.instructions.md,.github/agents/copilot.maintainer.agent.md,.github/prompts/copilot.maintain.prompt.md,ai/**/*.md"
 ---
 
 # Purpose
-Define stable repository-wide rules for maintaining Copilot instructions, agents, prompts, skills, and their source materials.
+Define stable rules for the Copilot maintenance toolchain and its related source materials.
 
 # Scope
-These rules apply to Copilot customization artifacts — including instruction, agent, prompt, and skill — and their source, composed, and published forms.
+These rules apply only to the Copilot maintenance toolchain itself - `copilot.maintenance.instructions.md`, `copilot.maintainer.agent.md`, `copilot.maintain.prompt.md` - and the related draft, deploy, and release artifacts under `ai/**`. They should not automatically govern arbitrary downstream project-local `.github` rules or third-party vendor AI artifacts.
 
 # Stable Rules
-- Treat `.copilot/` as the authoring layer and `.github/` as the publish layer.
+- Treat `ai/` as the authoring layer and `.github/` as the deploy target.
+- Organize draft artifacts module-first, language-second, type-third. Canonical layout is `ai/<module>/en/[type]/`, `ai/<module>/zh-TW/[type]/`, and `ai/<module>/sources/requirements/`.
+- `copilot-instructions.md` is a VS Code reserved filename but still belongs to the `copilot` module. Its canonical draft paths are `ai/copilot/en/instructions/copilot-instructions.md` and `ai/copilot/zh-TW/instructions/copilot-instructions.md`.
+- Do not create or maintain a parallel artifact track for `copilot-instructions.md` outside canonical `ai/copilot/en|zh-TW/` paths unless the user explicitly requests migration or compatibility handling.
+- If multiple candidate paths exist for the same namespace artifact, always update the canonical module path and explicitly report non-canonical paths as skipped.
+- Use this maintenance governance only for explicit maintenance or release work on the library's own Copilot artifacts.
+- Because the `applyTo` scope is intentionally narrow, `copilot.maintainer.agent.md` must also embed and enforce the same maintenance governance during execution; compliance must not rely on `applyTo` alone.
 - Keep instruction, agent, prompt, and skill responsibilities separated.
 - Preserve existing rules unless the new requirement explicitly changes them.
 - Minimize unrelated edits during updates.
@@ -18,24 +24,54 @@ These rules apply to Copilot customization artifacts — including instruction, 
 - Maintain section structure when merging, unless restructuring is explicitly required.
 - Keep terminology consistent across instruction, agent, prompt, and skill artifacts.
 - Use English as the normalization language during merge and analysis when bilingual processing is required.
-- Store finalized Traditional Chinese outputs under `.copilot/composed/` using corresponding relative paths.
+- Keep both draft language tracks in sync: English draft under `ai/<module>/en/[type]/` and Traditional Chinese draft under `ai/<module>/zh-TW/[type]/`.
 - Ensure every update produces clearly sectioned output.
 - Write `description` fields in Traditional Chinese; keep technical terms and keywords in English.
 - After every maintenance update, record the change in `CHANGELOG.md`. If the user specifies a version number, use it; if the user requests no version increment, update the existing latest version entry instead; if not specified, list the change under `[未發布]`.
-- Preserve the original user requirement text when processing updates; store it in a namespace-scoped history file under the user-specified path or the default location (`.copilot/sources/updates/<namespace>/`).
+- Preserve the original user requirement text when processing updates; store it in a namespace-scoped history file under the user-specified path or the default location (`ai/<module>/sources/requirements/`).
 - Requirement history should not be split into date-based files. Use one namespace-based history file (default: `<namespace>.requirement-history.md`) and append the new entry under the matching version section.
 - Requirement history entries must be recorded in reverse chronological order within the same version section so iterative changes remain easy to trace.
 - If no version is provided, record the requirement under the `[未發布]` section of the namespace history file.
 - Requirement history entries should use a formal template with at least: `Recorded At`, `Change Summary`, `Affected Artifacts`, and `Original Requirement`.
+- For reusable raw requirement recording shared by multiple agents/prompts, prefer a dedicated skill as the primary AI operation. Keep one operation with mode parameters instead of many fragmented handoff flows.
+- For usage efficiency in GitHub Copilot (by request), default to direct in-context execution and avoid unnecessary handoff to subagents.
+- The reusable requirement recorder should support three modes with a single parameterized contract:
+	- `chronological` (default): no version number tracking.
+	- `versioned-basic`: versioned logging with index table but no fixed body template.
+	- `versioned-structured`: versioned logging with index table and structured sections.
+- Unless overridden by explicit user input, the requirement recorder root path defaults to `/docs/histories`.
+- If the user explicitly specifies a storage path, index schema, or record template, those external requirements take precedence over defaults.
+- `chronological` mode defaults:
+	- Preserve original requirements in reverse chronological order.
+	- Add/update a top table sorted reverse chronologically with columns: `Time`, `Requirement Summary`.
+	- Default path format: `<root>/<yyyy>/<MM>/History_<yyyy-MM-dd>.md`.
+- `versioned-basic` mode defaults:
+	- Preserve original requirements in reverse chronological order.
+	- Add/update a top table sorted reverse chronologically with columns: `Version`, `Date`, `Summary`.
+	- If version is not specified, use `Draft.<sequence>`.
+	- On explicit release to `<version>`, migrate all `Draft.<sequence>` entries to `<version>.<sequence>`.
+	- If no explicit path is provided, default to nested version path and file: `<root>/v<major>/v<major>.<minor>/.../History-<major>.<minor>.<patch>.md`.
+- `versioned-structured` mode defaults:
+	- Preserve original requirements in reverse chronological order.
+	- Add/update a top table sorted reverse chronologically with columns: `Version`, `Date`, `Trigger`, `Summary`.
+	- If version is not specified, use `Draft.<sequence>`.
+	- On explicit release to `<version>`, migrate all `Draft.<sequence>` entries to `<version>.<sequence>`.
+	- Record body should include: `Trigger` (Chinese label), `Background`, `Requirements`, `Original Input`.
+	- If no explicit path is provided, use the same default as `versioned-basic` mode.
 - If the user explicitly declares a release, move current `[未發布]` entries into the target version section (or a newly created version section), and keep an empty `[未發布]` section for the next cycle.
 - When release is declared, migrate the requirement history entries from `[未發布]` into the matching formal version section in each affected namespace history file, and keep a fresh empty `[未發布]` section for subsequent changes.
+- If release is declared with a target version, update the repository `package.json` `version` field to the same release number in the same release operation.
 - Release publication should include git commit/tag command guidance with complete commit message content; if version control is unavailable, provide commands without forcing execution.
-- When release is declared, sync all contents of `.github/` to `/templates/` as the CLI deployment artifact before generating git release commands.
-- The `.github/TOOLS.md` file is part of release publication scope and must be included in the `.github/` to `/templates/` sync.
-- After every maintenance update, sync-update `.github/TOOLS.md` to reflect any additions, removals, or behavior changes in tools.
-- Speckit artifacts are vendor-maintained by Microsoft. Keep only backup copies under `.copilot/composed/speckit-backup/` and do not publish Speckit artifacts under `.github/`.
-- If the update target is not under `/.github/`, follow the authoring flow defined in `.copilot/README.md` (sources → base → composed → publish).
-- Every `.github/` file update MUST be accompanied by a corresponding update to the matching `.copilot/composed/` file with the complete Traditional Chinese translation in the same operation. Composed file updates are mandatory and must not be skipped or deferred.
+- During normal maintenance (non-release), update `ai/` draft artifacts only; do not update `.github/` or `/templates/` unless explicitly declared.
+- Deploy is an explicit stage. Update `.github/` only when the current prompt explicitly declares `deploy=true`.
+- When release is declared, sync `.github/` artifacts into `/templates/<module>/` by namespace, and keep repository-level Copilot governance artifacts in `/templates/` root as needed.
+- `.github/TOOLS.md` is deprecated and must not be generated. Tooling guide content must be maintained in module-level `README.md` files under `ai/<module>/README.md` and `/templates/<module>/README.md`.
+- The first paragraph immediately following the H1 title in each module README is consumed by the CLI `list` command as the module description. Keep this paragraph accurate when the module's purpose or capabilities change.
+- After every maintenance update, sync-update module-level `README.md` files if command behavior changes.
+- Domain-specific customization logic should be implemented in dedicated agents/prompts instead of being embedded into repository-wide maintenance instructions.
+- If the update target is Draft, follow `ai/README.md` flow (`ai/<module>/en` + `ai/<module>/zh-TW` -> Deploy -> Release).
+- Draft updates MUST NOT write to `.github/` unless Deploy was explicitly declared in the same prompt.
+- If Deploy is declared and `.github/` is updated, ensure both draft language files were updated in the same operation.
 
 # Naming Convention Rules
 - All instruction, agent, prompt, and skill artifacts use a namespace-based naming scheme.
@@ -82,12 +118,13 @@ These rules apply to Copilot customization artifacts — including instruction, 
 
 # Output Rules
 - The update result must include updated instruction, updated agent, updated prompt, and updated skill sections when applicable.
-- The final composed output must be written in Traditional Chinese.
+- The final Traditional Chinese draft output must be complete and up to date.
 - The output should include a concise change summary.
-- The output must include CHANGELOG Update and TOOLS.md Update confirmation sections.
+- The output must include CHANGELOG Update and Module README Update confirmation sections.
 - When release is requested, include release execution commands (`git add`, `git commit`, `git tag`, `git push`) with a complete commit message template.
 
 # Forbidden
 - Do not rewrite unrelated sections for style only.
 - Do not collapse instruction, agent, prompt, or skill into a single artifact.
 - Do not change old rules based on inference alone.
+- Do not dual-write the same artifact to both canonical and non-canonical `ai/` paths in the same maintenance operation.

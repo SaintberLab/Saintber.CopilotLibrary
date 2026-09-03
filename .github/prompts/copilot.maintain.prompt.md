@@ -1,30 +1,33 @@
 ---
-description: 以繁體中文需求更新 Copilot instruction、agent、prompt 及 skill 產物的可重複 prompt。本 prompt 必須在 agent 模式執行，並將實作委派給 copilot.maintainer 自訂 agent。
+description: 以繁體中文需求維護本函式庫自身 Copilot instruction、agent、prompt 及 skill 產物的 repository-level 可重複 prompt。本 prompt 必須在 agent 模式執行，並將實作委派給 copilot.maintainer 自訂 agent。
 agent: copilot.maintainer
-tools:[read/readFile, agent, edit/createFile, edit/editFiles]
+tools: [read/readFile, agent, edit/createFile, edit/editFiles]
 status: active
 ---
 
 # Input
 Provide the following:
-- `new_requirement_zh_tw`: the new requirement in Traditional Chinese
-- `requirement_storage_path` (optional): path to store original requirement history; defaults to `.copilot/sources/updates/<namespace>/`
+- `new_requirement`: the new requirement in Traditional Chinese
+- `module` (optional): target module (`code`, `copilot`, `docs`, `kb`, `migration`, `speckit`); omit only for repository-level governance changes
+- `requirement_storage_path` (optional): path to store original requirement history; defaults to `ai/<module>/sources/requirements/` (fallback `ai/sources/requirements/`)
 - `requirement_file_format` (optional): filename format for requirement history; defaults to `<namespace>.requirement-history.md` (e.g., `copilot.requirement-history.md`)
-- `existing_instruction`: the current instruction content (optional)
-- `existing_agent`: the current agent content (optional)
-- `existing_prompt`: the current prompt content (optional)
-- `existing_skill`: the current skill content (optional)
-- `composed_path` (optional): Traditional Chinese output path (defaults to `.copilot/composed/`)
-- `version` (optional): target version number for CHANGELOG.md entry; use `no-increment` to update the latest version entry in-place; omit to list under `[未發布]`
+- `draft_en_path` (optional): Draft English output path (defaults to `ai/<module>/en/`; fallback `ai/en/`)
+- `draft_zh_tw_path` (optional): Draft Traditional Chinese output path (defaults to `ai/<module>/zh-TW/`; fallback `ai/zh-TW/`)
+- `deploy` (optional): set to `true` only when the user explicitly declares Deploy
+- `version` (optional): target version number for `CHANGELOG.md`; use `no-increment` to update latest version in place; omit to list under `[未發布]`
 - `release` (optional): set to `true` when the user explicitly declares release publication
 
 # Task
-Use the `copilot.maintainer` subagent to update the existing Copilot customization artifacts using the new requirement.
+Use the `copilot.maintainer` subagent to update the library's own Copilot customization artifacts or execute explicit release maintenance using the new requirement.
+
+Do not use this as the default flow for arbitrary downstream project-local `.github` rule edits or third-party vendor AI updates unless the user explicitly requests `/copilot.maintain`.
 
 # Delegation Contract
 When invoking the `copilot.maintainer` subagent, require it to:
 1. Read the Traditional Chinese requirement.
-1.5. Preserve original requirement text in the specified/default namespace history file, grouped by version section, recorded in reverse chronological order, and formatted using the standard history template for traceability.
+1.5. Preserve original requirement text in the specified/default namespace history file (module-scoped by default), grouped by version section, recorded in reverse chronological order, and formatted using the standard history template for traceability.
+1.6. Regardless of whether the touched files are matched by `copilot.maintenance.instructions.md` `applyTo`, enforce the full maintenance governance embedded in `copilot.maintainer.agent.md` across all affected artifacts.
+1.7. Resolve canonical artifact paths before editing. For `copilot-instructions.md`, use only `ai/copilot/en/instructions/copilot-instructions.md` and `ai/copilot/zh-TW/instructions/copilot-instructions.md`; if non-canonical duplicates exist, report them as skipped unless explicit migration is requested.
 2. Translate the requirement into English for merge analysis.
 3. Merge the new requirement into the existing instruction, agent, prompt, and skill artifacts.
 4. Avoid duplication.
@@ -32,15 +35,16 @@ When invoking the `copilot.maintainer` subagent, require it to:
 6. Do not break old rules unless the new requirement explicitly changes them.
 7. Normalize wording and section structure.
 8. Verify cross-artifact consistency.
-9. Update the target files directly when write access is available.
-10. Produce full Traditional Chinese outputs for the composed layer including skill when applicable, and write them to the corresponding `.copilot/composed/` files. This is a mandatory step and must not be skipped.
+9. Update Draft files directly under `ai/<module>/en/` and `ai/<module>/zh-TW/` when write access is available.
+10. Update `.github/` only if `deploy=true` is explicitly declared in the current prompt.
 11. Return the final result in clearly sectioned output.
-12. Update `CHANGELOG.md` with a change record using the version behavior: if `version` input is provided, use it as the version tag; if `version` is `no-increment`, update the current latest version entry in-place; otherwise list under `[未發布]`.
-13. Sync-update `.github/TOOLS.md` to reflect any additions, removals, or behavior changes in tools resulting from this update.
-14. If release is declared, convert current `[未發布]` changes into the target version section and keep a fresh `[未發布]` section for next-cycle changes.
-14.5. If release is declared, also migrate the requirement history entries in affected namespace history files from `[未發布]` into the target version section.
-14.7. If release is declared, sync all contents of `.github/` to `/templates/` as the CLI deployment artifact, including `.github/TOOLS.md`.
-15. For release publication, provide complete git release commands (commit + tag + push) with a complete commit message; if git context is unavailable, provide command guidance without forcing execution.
+12. Update `CHANGELOG.md` with a change record using version behavior.
+13. Sync-update module README files (`ai/<module>/README.md`, `/templates/<module>/README.md`) to reflect behavior/tooling changes.
+14. If release is declared, convert current `[未發布]` changes into the target version section and keep a fresh `[未發布]` section.
+14.5. If release is declared, migrate requirement history entries in affected namespace history files from `[未發布]` into the target version section.
+14.6. If release is declared with a target version, update `package.json` so `version` matches that release number.
+14.7. If release is declared, sync all published artifacts from `.github/` into `/templates/<module>/` by namespace; keep repository-level Copilot governance files in `/templates/` root as needed.
+15. For release publication, provide complete git release commands (commit + tag + push); if git context is unavailable, provide command guidance without forcing execution.
 
 # Responsibility Rules
 - Put stable governance rules into the instruction.
@@ -49,8 +53,10 @@ When invoking the `copilot.maintainer` subagent, require it to:
 - Write `description` fields in Traditional Chinese; keep technical terms and keywords in English.
 
 # Required File Update Behavior
-- When target paths are provided and write access is available, update the corresponding files directly.
-- Write the full Traditional Chinese outputs to the matching `composed_path` paths.
+- When target paths are provided and write access is available, update corresponding files directly.
+- Without explicit `deploy=true`, `.github/` must not be modified.
+- If `release=true` and a concrete `version` is provided, update `package.json` so `version` matches release.
+- Write both English and Traditional Chinese Draft outputs to matching `draft_en_path` and `draft_zh_tw_path` paths.
 - Do not silently skip file updates. If a file cannot be updated, explicitly report which path failed and why.
 
 # Output Format
@@ -88,8 +94,8 @@ When invoking the `copilot.maintainer` subagent, require it to:
 - Version used: <version tag or "未發布">
 - Entry added or updated at: CHANGELOG.md
 
-## TOOLS.md Update
-- Changes applied: <summary of what was added/removed/updated in TOOLS.md>
+## Module README Update
+- Changes applied: <summary of what was added/removed/updated in module README files>
 
 ## Release Commands
 - Git context: <available|unavailable>
@@ -101,4 +107,6 @@ When invoking the `copilot.maintainer` subagent, require it to:
 - prompt: <updated|skipped|failed> - <path>
 - skill: <updated|skipped|failed|not-applicable> - <path>
 - changelog: <updated|skipped|failed> - CHANGELOG.md
-- tools: <updated|skipped|failed> - .github/TOOLS.md
+- module_readme: <updated|skipped|failed> - <path(s)>
+- deploy_publish: <updated|skipped|failed> - <.github path(s)>
+- package: <updated|skipped|failed> - package.json

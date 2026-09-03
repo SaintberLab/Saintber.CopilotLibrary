@@ -1,0 +1,91 @@
+# AI Toolchain Manifest
+# Maps modules to their draft, deploy, and release paths.
+# Used by CLI and deploy tooling to resolve artifact locations.
+
+version: "1.0.0"
+
+modules:
+  copilot:
+    description: "Copilot artifact maintenance governance"
+    source: "ai/copilot"
+    draft:
+      en: "ai/copilot/en"
+      zh-TW: "ai/copilot/zh-TW"
+    deploy:
+      github: ".github"
+    release: "templates/copilot"
+
+  migration:
+    description: ".NET migration toolchain"
+    source: "ai/migration"
+    draft:
+      en: "ai/migration/en"
+      zh-TW: "ai/migration/zh-TW"
+    deploy:
+      github: ".github"
+    release: "templates/migration"
+
+  kb:
+    description: "Knowledge base functionality"
+    source: "ai/kb"
+    draft:
+      en: "ai/kb/en"
+      zh-TW: "ai/kb/zh-TW"
+    deploy:
+      github: ".github"
+    release: "templates/kb"
+
+  docs:
+    description: "Architecture documentation rules and agents"
+    source: "ai/docs"
+    draft:
+      en: "ai/docs/en"
+      zh-TW: "ai/docs/zh-TW"
+    deploy:
+      github: ".github"
+    release: "templates/docs"
+
+  code:
+    description: "Product code conventions (tech stack, migration rules)"
+    source: "ai/code"
+    draft:
+      en: "ai/code/en"
+      zh-TW: "ai/code/zh-TW"
+    deploy:
+      github: ".github"
+    release: "templates/code"
+
+  speckit:
+    description: "SDD / Speckit process governance"
+    source: "ai/speckit"
+    draft:
+      en: "ai/speckit/en"
+      zh-TW: "ai/speckit/zh-TW"
+    deploy:
+      github: ".github"
+    release: "templates/speckit"
+
+artifact_types:
+  - instructions
+  - agents
+  - prompts
+  - skills
+  - mcp
+  - sdk
+
+deploy_targets:
+  github_copilot:
+    platform: "GitHub Copilot"
+    path: ".github"
+    layout: flat
+    status: active
+  mcp:
+    platform: "MCP"
+    path: ".mcp"
+    layout: flat
+    status: planned
+  sdk:
+    platform: "Copilot SDK"
+    path: "sdk"
+    layout: flat
+    status: planned
